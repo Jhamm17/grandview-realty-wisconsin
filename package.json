@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "setup-cache": "node scripts/setup-cache.js",
-    "video-optimize": "node scripts/optimize-videos.js"
+    "video-optimize": "node scripts/optimize-videos.js",
+    "create-wisconsin-admin": "node scripts/create-wisconsin-admin.js"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
