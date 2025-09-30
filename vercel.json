@@ -1,0 +1,61 @@
+{
+    "version": 2,
+    "buildCommand": "next build",
+    "devCommand": "next dev",
+    "installCommand": "npm install",
+    "framework": "nextjs",
+    "regions": ["iad1"],
+    "env": {
+        "NEXT_PUBLIC_MRED_API_URL": "https://api.mlsgrid.com/v2",
+        "NEXT_PUBLIC_MRED_TOKEN_URL": "https://api.mlsgrid.com/oauth/token",
+        "MRED_API_URL": "https://api.mlsgrid.com/v2",
+        "MRED_CLIENT_ID": "development_id",
+        "MRED_CLIENT_SECRET": "development_secret",
+        "BUILD_TIME": "true"
+    },
+    "crons": [
+        {
+            "path": "/api/cron/daily-update",
+            "schedule": "0 6 * * *"
+        },
+        {
+            "path": "/api/cron/instagram",
+            "schedule": "0 9 * * *"
+        }
+    ],
+    "redirects": [
+        {
+            "source": "/all",
+            "destination": "/properties",
+            "permanent": true
+        }
+    ],
+    "headers": [
+        {
+            "source": "/api/(.*)",
+            "headers": [
+                {
+                    "key": "Cache-Control",
+                    "value": "public, max-age=60, stale-while-revalidate=300"
+                }
+            ]
+        },
+        {
+            "source": "/(.*)",
+            "headers": [
+                {
+                    "key": "X-Content-Type-Options",
+                    "value": "nosniff"
+                },
+                {
+                    "key": "X-Frame-Options",
+                    "value": "DENY"
+                },
+                {
+                    "key": "X-XSS-Protection",
+                    "value": "1; mode=block"
+                }
+            ]
+        }
+    ]
+} 

@@ -1,0 +1,129 @@
+# Supabase Configuration
+# This file configures security settings for your Supabase project
+
+[api]
+# Disable anonymous access to the API
+enabled = true
+# Require authentication for all requests
+require_auth = true
+
+[auth]
+# Enable email confirmation
+enable_signup = false  # Disable public signup
+enable_confirmations = true
+enable_email_change_confirmations = true
+
+# Password policy
+minimum_password_length = 8
+require_password_uppercase = true
+require_password_lowercase = true
+require_password_numbers = true
+require_password_special_characters = true
+
+# Session settings
+session_timeout = 3600  # 1 hour
+refresh_token_rotation_enabled = true
+security_update_password_require_reauthentication = true
+
+# Rate limiting
+rate_limit_email_sent = 10  # Max 10 emails per hour
+rate_limit_sms_sent = 10    # Max 10 SMS per hour
+
+[db]
+# Enable connection pooling
+pooler_enabled = true
+pooler_mode = "transaction"
+pooler_default_pool_size = 15
+pooler_max_client_conn = 100
+
+# Enable realtime (restrict to authenticated users only)
+realtime_enabled = true
+
+[storage]
+# Enable storage with restrictions
+enabled = true
+file_size_limit = "50MiB"
+allowed_mime_types = ["image/jpeg", "image/png", "image/gif", "image/webp"]
+
+# Storage policies (will be set via SQL)
+# Only authenticated users can upload
+# Only public read access for images
+
+[edge_functions]
+# Enable edge functions
+enabled = true
+# Require authentication for edge function calls
+require_auth = true
+
+[analytics]
+# Disable analytics for privacy
+enabled = false
+
+[experimental]
+# Enable experimental features
+enable_realtime = true
+enable_edge_functions = true
+enable_storage = true
+
+# Security headers
+[headers]
+# Security headers for all responses
+X-Frame-Options = "DENY"
+X-Content-Type-Options = "nosniff"
+X-XSS-Protection = "1; mode=block"
+Referrer-Policy = "strict-origin-when-cross-origin"
+Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https:; frame-ancestors 'none';"
+
+# CORS settings
+[cors]
+# Restrict CORS to your domain only
+allowed_origins = [
+          "https://grandviewsells.com",
+        "https://grandview-realty-lre5f2xct-jackson-hamms-projects.vercel.app",
+  "http://localhost:3000"  # For development
+]
+allowed_methods = ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+allowed_headers = ["*"]
+exposed_headers = ["Content-Length", "Content-Range"]
+max_age = 86400
+credentials = true
+
+# Rate limiting for API
+[rate_limit]
+# Global rate limiting
+enabled = true
+requests_per_minute = 60
+burst_size = 100
+
+# Per-user rate limiting
+user_requests_per_minute = 30
+user_burst_size = 50
+
+# IP-based rate limiting
+ip_requests_per_minute = 100
+ip_burst_size = 200
+
+# Block suspicious IPs
+[security]
+# Enable IP blocking
+enable_ip_blocking = true
+# Block IPs with too many failed auth attempts
+max_failed_auth_attempts = 5
+block_duration_minutes = 15
+
+# Enable request logging
+enable_request_logging = true
+log_level = "info"
+
+# JWT settings
+[jwt]
+# JWT expiration
+exp = 3600  # 1 hour
+refresh_exp = 604800  # 7 days
+
+# JWT claims
+default_role = "authenticated"
+admin_role = "service_role"
+
+# Enable JWT verification
+verify_signature = true 

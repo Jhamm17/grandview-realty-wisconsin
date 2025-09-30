@@ -1,0 +1,72 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: #2C5282;
+  --secondary: #718096;
+  --accent: #F6AD55;
+  --background: #ffffff;
+  --foreground: #2D3748;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+@layer components {
+  .container-padding {
+    @apply px-4 md:px-8 lg:px-16 max-w-7xl mx-auto;
+  }
+  
+  .btn-primary {
+    @apply bg-primary text-white px-6 py-2 rounded hover:bg-primary/90 transition-colors;
+  }
+  
+  .btn-secondary {
+    @apply bg-white text-primary border border-primary px-6 py-2 rounded hover:bg-gray-50 transition-colors;
+  }
+  
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* Internet Explorer 10+ */
+    scrollbar-width: none;  /* Firefox */
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;  /* Safari and Chrome */
+  }
+  
+  /* Charity page scroll control */
+  .charity-page {
+    overflow-x: hidden;
+    position: relative;
+  }
+  
+  /* Prevent bounce-back on charity page */
+  .charity-page {
+    overscroll-behavior: none;
+    -webkit-overflow-scrolling: auto;
+  }
+  
+  .charity-page body,
+  .charity-page html {
+    overscroll-behavior: none;
+    -webkit-overflow-scrolling: auto;
+  }
+  
+  .charity-page body {
+    position: relative;
+    overflow-x: hidden;
+  }
+  
+  .charity-content {
+    position: relative;
+    z-index: 10;
+  }
+}
