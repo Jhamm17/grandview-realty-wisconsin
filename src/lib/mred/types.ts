@@ -56,7 +56,6 @@ export interface Property {
   ShowingInstructions?: string;
   Ownership?: string;
   PropertyCondition?: string;
-  PublicRemarks: string;
   PrivateRemarks?: string;
 
   // Additional Features
