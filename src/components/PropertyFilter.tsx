@@ -75,7 +75,8 @@ function filterProperties(properties: Property[], filters: FilterState): Propert
 }
 
 // Helper function to get status badge style
-function getStatusBadgeStyle(status: string): string {
+function getStatusBadgeStyle(status?: string | null): string {
+  if (!status) return 'bg-gray-500';
   if (status === 'Active') {
     return 'bg-blue-400';
   } else if (status === 'ActiveUnderContract' || status === 'Under Contract' || status === 'Pending' || status === 'Contingent') {
@@ -88,7 +89,8 @@ function getStatusBadgeStyle(status: string): string {
 }
 
 // Helper function to get status badge text
-function getStatusBadgeText(status: string): string {
+function getStatusBadgeText(status?: string | null): string {
+  if (!status) return 'N/A';
   const cleanedStatus = cleanStatusText(status);
   
   if (cleanedStatus === 'Active') {
@@ -347,8 +349,8 @@ export default function PropertyFilter({ initialProperties }: FilterProps) {
                           <span className="text-gray-400">Image unavailable</span>
                         </div>
                         {/* Status Badge */}
-                        <div className={`absolute bottom-0 left-0 text-white px-2 py-1 text-lg font-black tracking-wider ${getStatusBadgeStyle(property.StandardStatus)}`} style={{ borderRadius: '0' }}>
-                          {getStatusBadgeText(property.StandardStatus)}
+                        <div className={`absolute bottom-0 left-0 text-white px-2 py-1 text-lg font-black tracking-wider ${getStatusBadgeStyle(property.StandardStatus || property.MlsStatus)}`} style={{ borderRadius: '0' }}>
+                          {getStatusBadgeText(property.StandardStatus || property.MlsStatus)}
                         </div>
                       </>
                     );
