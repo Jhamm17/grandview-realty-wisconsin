@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server';
 import { PropertyCacheService } from '@/lib/property-cache';
 
+// Mark this route as dynamic to prevent build-time static generation
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 export async function GET() {
   try {
     console.log('[API] Fetching all properties...');

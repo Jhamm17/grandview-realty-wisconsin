@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
+// Mark this route as dynamic to prevent build-time static generation
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 // Create a service role client for server-side operations
 const supabase = createClient(
   process.env.NEXT_PUBLIC_WISCONSIN_SUPABASE_URL!,
