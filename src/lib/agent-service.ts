@@ -1,9 +1,12 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_WISCONSIN_SUPABASE_URL!,
-  process.env.WISCONSIN_SUPABASE_SERVICE_ROLE_KEY!
-);
+// Lazy-initialize Supabase client to avoid build-time errors
+function getSupabaseClient() {
+  return createClient(
+    process.env.NEXT_PUBLIC_WISCONSIN_SUPABASE_URL!,
+    process.env.WISCONSIN_SUPABASE_SERVICE_ROLE_KEY!
+  );
+}
 
 export interface Agent {
   id: string;
@@ -24,6 +27,7 @@ export interface Agent {
 
 export async function getAgentByNameOrEmail(nameOrEmail: string): Promise<Agent | null> {
   try {
+    const supabase = getSupabaseClient();
     // First try to find by exact email match
     const { data: emailMatch, error: emailError } = await supabase
       .from('agents')

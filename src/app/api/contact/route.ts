@@ -5,7 +5,10 @@ import { Resend } from 'resend';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Lazy-initialize Resend client to avoid build-time errors
+function getResendClient() {
+  return new Resend(process.env.RESEND_API_KEY);
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -76,6 +79,7 @@ This message was sent from the Grandview Realty contact form.
     }
 
     // Send email automatically using Resend
+    const resend = getResendClient();
     const { data, error } = await resend.emails.send({
       from: 'onboarding@resend.dev', // Use Resend's default domain until grandviewsells.com is verified
       to: ['lynda@grandviewsells.com'],

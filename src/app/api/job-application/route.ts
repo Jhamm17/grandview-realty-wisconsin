@@ -1,7 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Mark this route as dynamic to prevent build-time static generation
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
+// Lazy-initialize Resend client to avoid build-time errors
+function getResendClient() {
+  return new Resend(process.env.RESEND_API_KEY);
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -49,6 +56,7 @@ ${name}
     }
 
     // Send email automatically using Resend
+    const resend = getResendClient();
     const { data, error } = await resend.emails.send({
       from: 'onboarding@resend.dev', // Use Resend's default domain until grandviewsells.com is verified
       to: ['lynda@grandviewsells.com'],

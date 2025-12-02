@@ -5,14 +5,17 @@ import { createClient } from '@supabase/supabase-js';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-// Create a service role client for server-side operations
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_WISCONSIN_SUPABASE_URL!,
-  process.env.WISCONSIN_SUPABASE_SERVICE_ROLE_KEY!
-);
+// Lazy-initialize Supabase client to avoid build-time errors
+function getSupabaseClient() {
+  return createClient(
+    process.env.NEXT_PUBLIC_WISCONSIN_SUPABASE_URL!,
+    process.env.WISCONSIN_SUPABASE_SERVICE_ROLE_KEY!
+  );
+}
 
 export async function GET() {
   try {
+    const supabase = getSupabaseClient();
     const { data: careers, error } = await supabase
       .from('careers')
       .select('*')
