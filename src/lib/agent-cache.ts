@@ -202,6 +202,7 @@ export class AgentCacheService {
   // Get all agents (for the agents listing page)
   static async getAllAgents(): Promise<Agent[]> {
     try {
+      const supabase = getSupabaseClient();
       const { data: agents, error } = await supabase
         .from('agents')
         .select('*')
@@ -224,6 +225,7 @@ export class AgentCacheService {
   // Invalidate cache for a specific agent
   static async invalidateAgentCache(slug: string): Promise<void> {
     try {
+      const supabase = getSupabaseClient();
       const { error } = await supabase
         .from('agent_cache')
         .delete()
@@ -242,6 +244,7 @@ export class AgentCacheService {
   // Clear all agent cache
   static async clearAllAgentCache(): Promise<void> {
     try {
+      const supabase = getSupabaseClient();
       const { error } = await supabase
         .from('agent_cache')
         .delete()
