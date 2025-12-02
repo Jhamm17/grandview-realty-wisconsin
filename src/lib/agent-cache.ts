@@ -1,10 +1,13 @@
 import { createClient } from '@supabase/supabase-js';
 import { Property } from './mred/types';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_WISCONSIN_SUPABASE_URL!,
-  process.env.WISCONSIN_SUPABASE_SERVICE_ROLE_KEY!
-);
+// Lazy-initialize Supabase client to avoid build-time errors
+function getSupabaseClient() {
+  return createClient(
+    process.env.NEXT_PUBLIC_WISCONSIN_SUPABASE_URL!,
+    process.env.WISCONSIN_SUPABASE_SERVICE_ROLE_KEY!
+  );
+}
 
 export interface Agent {
   id: string;
@@ -54,6 +57,7 @@ export class AgentCacheService {
   // Fetch agent data and their listings, then cache it
   private static async fetchAndCacheAgent(slug: string): Promise<CachedAgent | null> {
     try {
+      const supabase = getSupabaseClient();
       // Get agent data
       const { data: agent, error: agentError } = await supabase
         .from('agents')
@@ -104,6 +108,7 @@ export class AgentCacheService {
   // Get agent listings from property cache
   private static async getAgentListings(agentName: string): Promise<Property[]> {
     try {
+      const supabase = getSupabaseClient();
       console.log(`[AgentCache] Searching for agent: ${agentName}`);
       
       // Get all active properties from cache
