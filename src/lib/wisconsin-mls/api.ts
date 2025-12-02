@@ -311,10 +311,10 @@ class WisconsinMLSService {
                 results = results.filter(p => p.ListPrice <= params.maxPrice!);
             }
             if (params.beds) {
-                results = results.filter(p => p.BedroomsTotal >= params.beds!);
+                results = results.filter(p => (p.BedroomsTotal ?? 0) >= params.beds!);
             }
             if (params.baths) {
-                results = results.filter(p => p.BathroomsTotalInteger >= params.baths!);
+                results = results.filter(p => (p.BathroomsTotalInteger ?? 0) >= params.baths!);
             }
 
             console.log('Returning filtered mock data:', results);
