@@ -13,16 +13,18 @@
         "MRED_CLIENT_SECRET": "development_secret",
         "BUILD_TIME": "true"
     },
-    "crons": [
-        {
-            "path": "/api/cron/daily-update",
-            "schedule": "0 6 * * *"
-        },
-        {
-            "path": "/api/cron/instagram",
-            "schedule": "0 9 * * *"
-        }
-    ],
+    // Cron jobs removed - using external cron service instead (cron-job.org, GitHub Actions, etc.)
+    // See ALTERNATIVE_CRON_SOLUTIONS.md for setup instructions
+    // "crons": [
+    //     {
+    //         "path": "/api/cron/daily-update",
+    //         "schedule": "0 6 * * *"
+    //     },
+    //     {
+    //         "path": "/api/cron/instagram",
+    //         "schedule": "0 9 * * *"
+    //     }
+    // ],
     "redirects": [
         {
             "source": "/all",

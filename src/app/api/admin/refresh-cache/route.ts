@@ -122,10 +122,23 @@ async function refreshCache(isCronJob: boolean, adminEmail?: string) {
   }
 }
 
-// GET handler for Vercel cron jobs
-export async function GET() {
+// GET handler for external cron services (cron-job.org, GitHub Actions, etc.)
+export async function GET(request: NextRequest) {
   try {
-    console.log('🔍 GET handler called for /api/admin/refresh-cache');
+    // Check for cron secret token (optional, for security)
+    const cronSecret = request.headers.get('x-cron-secret') || request.headers.get('authorization')?.replace('Bearer ', '');
+    const expectedSecret = process.env.CRON_SECRET;
+    
+    // If CRON_SECRET is set, require it. Otherwise allow unauthenticated calls (for external cron services)
+    if (expectedSecret && cronSecret !== expectedSecret) {
+      console.warn('⚠️ Unauthorized cron attempt - missing or invalid secret');
+      return NextResponse.json(
+        { error: 'Unauthorized - valid cron secret required' },
+        { status: 401 }
+      );
+    }
+    
+    console.log('🔍 GET handler called for /api/admin/refresh-cache (external cron)');
     
     const result = await refreshCache(true);
     return NextResponse.json(result);
