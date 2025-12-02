@@ -3,6 +3,10 @@ import { PropertyCacheService } from '@/lib/property-cache';
 import { AgentCacheService } from '@/lib/agent-cache';
 import { revalidatePath } from 'next/cache';
 
+// Mark this route as dynamic to prevent build-time static generation
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 export async function POST(request: NextRequest) {
   try {
     // Check if this is a cron job request (Vercel cron jobs send a special header)
