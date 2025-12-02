@@ -108,11 +108,12 @@ class WisconsinMLSService {
         const headers = await wisconsinMLSAuth.getAuthHeaders();
 
         console.log(`[Wisconsin MLS] Making API request to: ${url}`);
+        const headersObj = headers as Record<string, string>;
         console.log(`[Wisconsin MLS] Headers being sent:`, {
-            'Authorization': headers['Authorization'] ? `Bearer ${(headers['Authorization'] as string).substring(7, 17)}...` : 'MISSING',
-            'Accept': headers['Accept'],
-            'OUID': headers['OUID'],
-            'MLS-Aligned_User-Agent': headers['MLS-Aligned_User-Agent']
+            'Authorization': headersObj['Authorization'] ? `Bearer ${headersObj['Authorization'].substring(7, 17)}...` : 'MISSING',
+            'Accept': headersObj['Accept'],
+            'OUID': headersObj['OUID'],
+            'MLS-Aligned_User-Agent': headersObj['MLS-Aligned_User-Agent']
         });
         
         // Add timeout to prevent hanging
