@@ -15,7 +15,7 @@ export default function Home() {
             <HeroVideo 
               key="hero-video"
               posterImage="/hero-image.jpg"
-              posterAlt="Beautiful homes in Chicagoland"
+              posterAlt="Beautiful homes in Wisconsin"
             />
             
             {/* Overlay for better text readability */}
@@ -27,10 +27,10 @@ export default function Home() {
         <div className="container-padding relative z-10 flex items-center justify-center min-h-full">
           <div className="max-w-2xl text-center">
             <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 text-white drop-shadow-lg" style={{ lineHeight: '1.1' }}>
-              Your Gateway to Chicagoland Living
+              Your Gateway to Wisconsin Living
             </h1>
             <p className="text-lg md:text-xl lg:text-2xl mb-8 text-white/90 drop-shadow-md">
-              Discover exceptional properties across the Chicago metropolitan area with Grandview Realty&apos;s expert guidance.
+              Discover exceptional properties across Wisconsin with Grandview Realty&apos;s expert guidance and local market expertise.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/properties" className="btn-primary text-center text-lg px-8 py-3">
@@ -117,16 +117,16 @@ export default function Home() {
 
       {/* Enhanced Mission Statement Section */}
       <section className="py-20 bg-gradient-to-br from-gray-50 to-white">
-        <div className="container-padding max-w-6xl mx-auto">
+        <div className="container-padding max-w-4xl mx-auto">
           {/* Section Header */}
           <div className="text-center mb-16">
             <h2 className="text-5xl md:text-6xl font-bold text-[#081d36] mb-4">Our Mission</h2>
             <div className="w-32 h-2 bg-[#081d36] mx-auto rounded-full"></div>
           </div>
           
-          {/* Main Mission Statement with Dynamic Layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center lg:items-end mb-8">
-            <div className="space-y-6 lg:space-y-8 text-center lg:text-left">
+          {/* Main Mission Statement - Centered */}
+          <div className="text-center">
+            <div className="space-y-6 lg:space-y-8">
               <div className="inline-block bg-[#081d36]/10 text-[#081d36] px-4 py-2 rounded-full text-sm font-medium">
                 Our Promise
               </div>
@@ -135,33 +135,10 @@ export default function Home() {
               </h3>
               <div className="bg-white rounded-2xl p-6 lg:p-8 shadow-xl border border-gray-100">
                 <p className="text-lg lg:text-xl text-gray-700 leading-relaxed">
-                  At Grandview Realty, LLC, our mission is to guide individuals and families through every step of their real estate journey—whether they are buying or selling—with confidence, care, and clarity. We are committed to delivering exceptional experiences through integrity, local expertise, and personalized service. Rooted in the communities we serve across Illinois, we strive to build lasting relationships, support local causes, and ensure each client feels informed, empowered, and valued throughout the process.
+                  At Grandview Realty, LLC, our mission is to guide individuals and families through every step of their real estate journey—whether they are buying or selling—with confidence, care, and clarity. We are committed to delivering exceptional experiences through integrity, local expertise, and personalized service. Rooted in the communities we serve across Wisconsin, we strive to build lasting relationships, support local causes, and ensure each client feels informed, empowered, and valued throughout the process.
                 </p>
               </div>
             </div>
-            
-            <div className="relative order-first lg:order-last">
-              <div className="relative overflow-hidden shadow-2xl rounded-2xl">
-                <Image
-                  src="/grandview.png"
-                  alt="Grandview Realty"
-                  width={600}
-                  height={600}
-                  className="w-full h-auto object-contain"
-                  quality={90}
-                />
-              </div>
-            </div>
-          </div>
-          
-          {/* Trusted by Illinois families section */}
-          <div className="flex items-center space-x-4 justify-center">
-            <div className="w-12 h-12 bg-[#081d36] rounded-full flex items-center justify-center">
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            <span className="text-lg font-medium text-[#081d36]">Trusted by Illinois families since 2017</span>
           </div>
         </div>
       </section>
@@ -194,7 +171,7 @@ export default function Home() {
                 </svg>
               </div>
               <h3 className="text-2xl font-bold text-white mb-4">Community</h3>
-              <p className="text-white/90 leading-relaxed">We&apos;re dedicated to strengthening and supporting the communities we serve across Illinois.</p>
+              <p className="text-white/90 leading-relaxed">We&apos;re dedicated to strengthening and supporting the communities we serve across Wisconsin.</p>
             </div>
 
             <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 text-center border border-white/20 hover:bg-white/20 transition-all duration-300">
@@ -257,21 +234,21 @@ export default function Home() {
             {[
               {
                 title: "Local Expertise",
-                description: "Deep knowledge of Chicagoland's diverse real estate markets and neighborhoods.",
+                description: "Deep knowledge of Wisconsin's diverse real estate markets, from Milwaukee to Madison and beyond.",
                 icon: (
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 )
               },
               {
                 title: "Dedicated Service",
-                description: "Personalized attention and support throughout your real estate journey across the Chicago metropolitan area.",
+                description: "Personalized attention and support throughout your real estate journey across Wisconsin.",
                 icon: (
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 )
               },
               {
                 title: "Proven Results",
-                description: "Successfully helping clients buy and sell properties throughout Chicagoland since 2005.",
+                description: "Successfully helping clients buy and sell properties throughout Wisconsin since 2017.",
                 icon: (
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 )

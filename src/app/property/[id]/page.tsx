@@ -87,6 +87,24 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
       console.log(`[PropertyPage] Found agent:`, agent);
     }
 
+    // Determine if property is under contract to set correct back link
+    const mlsStatus = property.MlsStatus || '';
+    const standardStatus = property.StandardStatus || '';
+    const isUnderContract = 
+      mlsStatus === 'UnderContract' ||
+      mlsStatus === 'Pending' ||
+      standardStatus === 'ActiveUnderContract' || 
+      standardStatus === 'UnderContract' ||
+      standardStatus === 'Pending' ||
+      standardStatus === 'Contingent' ||
+      standardStatus?.includes('Contract') ||
+      standardStatus?.includes('Pending') ||
+      standardStatus?.includes('Contingent') ||
+      standardStatus?.includes('Under');
+    
+    const backLink = isUnderContract ? '/properties/under-contract' : '/properties';
+    const backText = isUnderContract ? 'Back to Under Contract Properties' : 'Back to Properties';
+
     return (
       <div className="container-padding py-16">
         {/* Preload property images for better performance */}
@@ -94,8 +112,8 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
         
         {/* Back Button */}
         <div className="mb-8">
-          <Link href="/properties" className="text-blue-600 hover:text-blue-800 underline flex items-center">
-            ← Back to Properties
+          <Link href={backLink} className="text-blue-600 hover:text-blue-800 underline flex items-center">
+            ← {backText}
           </Link>
         </div>
 

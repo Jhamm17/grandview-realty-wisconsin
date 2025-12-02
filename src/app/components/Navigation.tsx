@@ -123,10 +123,6 @@ export function Header() {
       { name: "Affiliations & Accreditation", href: "/about/affiliations" },
       { name: "Legal & Compliance", href: "/about/legal" },
     ],
-    community: [
-      { name: "Charity & Community Involvement", href: "/community/charity" },
-      { name: "Social Media", href: "/community/social-media" },
-    ],
     contact: [
       { name: "General Inquiry", href: "/contact/general-inquiry" },
       { name: "Looking to Buy", href: "/contact/looking-to-buy" },
@@ -181,7 +177,6 @@ export function Header() {
             <NavDropdown title="Properties" items={navItems.properties} />
             <NavDropdown title="Team" items={navItems.team} />
             <NavDropdown title="About Us" items={navItems.about} />
-            <NavDropdown title="Community" items={navItems.community} />
             <Link 
               href="/careers" 
               className={`text-white hover:text-white/80 transition-colors text-base font-medium py-4 px-2 ${
@@ -226,8 +221,8 @@ export function Header() {
               >
                 Home
               </Link>
-              {/* Properties, Team, About, Community dropdowns */}
-              {Object.entries(navItems).filter(([key]) => key !== 'contact').map(([key, items]) => (
+              {/* Properties, Team, About dropdowns */}
+              {Object.entries(navItems).filter(([key]) => key !== 'contact' && key !== 'community').map(([key, items]) => (
                 <div key={key} className="space-y-1">
                   <button
                     className="font-medium text-white flex items-center justify-between w-full text-base py-2 px-3 rounded"
@@ -337,16 +332,16 @@ export function Footer() {
               />
             </div>
             <p className="text-white/80 mb-4 text-base md:text-lg max-w-xs md:max-w-sm mx-auto lg:mx-0 text-center lg:text-left">
-              Your trusted real estate partner across the Chicago metropolitan area.
+              Your trusted real estate partner across Wisconsin.
             </p>
             <div className="text-white/80 text-base md:text-lg">
-              <p>501 West State Street Suite 103</p>
-              <p>Geneva, IL 60134</p>
+              <p>Serving Wisconsin Communities</p>
+              <p>Milwaukee • Madison • Green Bay • Kenosha</p>
             </div>
           </div>
 
-          {/* Quick Links, Legal, and Community - More Spaced Out */}
-          <div className="grid grid-cols-3 gap-8 md:gap-12 lg:col-span-2">
+          {/* Quick Links and Legal - More Spaced Out */}
+          <div className="grid grid-cols-2 gap-8 md:gap-12 lg:col-span-2">
             {/* Quick Navigation */}
             <div className="text-center lg:text-left">
               <h3 className="text-lg font-semibold mb-4 text-white">Quick Links</h3>
@@ -369,14 +364,6 @@ export function Footer() {
               </div>
             </div>
 
-            {/* Community */}
-            <div className="text-center lg:text-left">
-              <h3 className="text-lg font-semibold mb-4 text-white">Community</h3>
-              <div className="flex flex-col space-y-2">
-                <Link href="/community/social-media" className="text-white/80 hover:text-[#60a5fa] transition-colors text-sm">Social Media</Link>
-                <Link href="/community/charity" className="text-white/80 hover:text-[#60a5fa] transition-colors text-sm">Charity</Link>
-              </div>
-            </div>
           </div>
         </div>
         
@@ -385,7 +372,7 @@ export function Footer() {
           {/* BBB Accreditation */}
           <div>
             <a 
-              href="https://www.bbb.org/us/il/geneva/profile/real-estate-broker/grandview-realty-0654-90017168" 
+              href="https://www.bbb.org/us/wi/milwaukee/profile/real-estate-broker/grandview-realty-wisconsin" 
               target="_blank" 
               rel="noopener noreferrer"
               className="inline-block hover:opacity-80 transition-opacity"
@@ -403,7 +390,7 @@ export function Footer() {
           {/* Social Media Icons */}
           <div className="flex space-x-3">
             <a 
-              href="https://www.facebook.com/GrandviewRealtyGeneva/" 
+              href="https://www.facebook.com/GrandviewRealtyWisconsin/" 
               className="text-white/80 hover:text-[#60a5fa] transition-colors" 
               aria-label="Facebook"
               target="_blank"
@@ -414,7 +401,7 @@ export function Footer() {
               </svg>
             </a>
             <a 
-              href="https://www.instagram.com/grandviewrealtygeneva/" 
+              href="https://www.instagram.com/grandviewrealtywisconsin/" 
               className="text-white/80 hover:text-[#60a5fa] transition-colors" 
               aria-label="Instagram"
               target="_blank"

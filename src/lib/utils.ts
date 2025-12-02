@@ -1,5 +1,5 @@
 // Utility function to clean up property status text
-export function cleanStatusText(status: string): string {
+export function cleanStatusText(status?: string | null): string {
   if (!status) return 'N/A';
   
   // Remove common prefixes and clean up the text
@@ -15,4 +15,9 @@ export function cleanStatusText(status: string): string {
   cleaned = cleaned.replace(/\b\w/g, l => l.toUpperCase());
   
   return cleaned;
+}
+
+// Helper function to get property status (StandardStatus or MlsStatus fallback)
+export function getPropertyStatus(property: { StandardStatus?: string; MlsStatus?: string }): string {
+  return property.StandardStatus || property.MlsStatus || 'Unknown';
 } 

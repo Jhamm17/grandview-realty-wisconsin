@@ -1,8 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 import { Property } from './mred/types';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabaseUrl = process.env.NEXT_PUBLIC_WISCONSIN_SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_WISCONSIN_SUPABASE_ANON_KEY;
 
 // Add defensive programming for missing environment variables
 let supabaseClient;

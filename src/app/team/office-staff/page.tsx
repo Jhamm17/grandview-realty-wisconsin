@@ -1,3 +1,5 @@
+import { supabase } from '@/lib/supabase';
+
 export const dynamic = 'force-dynamic';
 
 interface OfficeStaff {
@@ -16,17 +18,19 @@ interface OfficeStaff {
 
 async function getOfficeStaff(): Promise<OfficeStaff[]> {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'https://grandviewsells.com'}/api/office-staff`, {
-      next: { revalidate: 10 } // Revalidate every 10 seconds
-    });
+    // Use Wisconsin Supabase directly instead of fetching from external API
+    const { data: officeStaff, error } = await supabase
+      .from('office_staff')
+      .select('*')
+      .eq('is_active', true)
+      .order('sort_order', { ascending: true });
     
-    if (!response.ok) {
-      console.error('Failed to fetch office staff');
+    if (error) {
+      console.error('Error fetching office staff:', error);
       return [];
     }
     
-    const data = await response.json();
-    return data.officeStaff || [];
+    return officeStaff || [];
   } catch (error) {
     console.error('Error fetching office staff:', error);
     return [];

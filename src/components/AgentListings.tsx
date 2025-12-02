@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Image from 'next/image';
+// Using regular img tags for Supabase storage URLs
 import Link from 'next/link';
 import { Property } from '@/lib/mred/types';
 
@@ -117,20 +117,11 @@ export default function AgentListings({ agentId, agentName, listings: preFetched
                         preloadImg.src = firstImage.MediaURL;
                       }
                       
-                      return firstImage?.MediaURL.startsWith('https://grandview-realty.jphamm2001.workers.dev/proxy') ? (
+                      return (
                         <img
                           src={firstImage.MediaURL}
                           alt={listing.UnparsedAddress || 'Property'}
                           className="w-full h-full object-cover"
-                          loading="lazy"
-                        />
-                      ) : (
-                        <Image
-                          src={firstImage.MediaURL}
-                          alt={listing.UnparsedAddress || 'Property'}
-                          fill
-                          className="object-cover"
-                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                           loading="lazy"
                         />
                       );

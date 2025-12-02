@@ -1,22 +1,49 @@
 import { supabase } from './supabase';
 import { AdminUser, AuthUser } from './supabase';
+import bcrypt from 'bcryptjs';
 
 export class AdminAuthService {
-  // Sign in with email and password (simple authentication)
+  // Sign in with email and password (with bcrypt password hashing)
   static async signIn(email: string, password: string): Promise<{ success: boolean; user?: AuthUser; error?: string }> {
     try {
-      // Check if user exists in admin_users table with matching password
+      // Find user by email (don't filter by password - we'll verify it separately)
       const { data: adminUsers, error } = await supabase
         .from('admin_users')
         .select('*')
-        .eq('email', email)
-        .eq('password', password); // Note: This should be hashed password in production
+        .eq('email', email.toLowerCase().trim()); // Normalize email
 
-      if (error || !adminUsers || adminUsers.length === 0) {
+      if (error) {
+        console.error('Error querying admin_users:', error);
+        return { success: false, error: 'Database error' };
+      }
+
+      if (!adminUsers || adminUsers.length === 0) {
         return { success: false, error: 'Invalid email or password' };
       }
 
       const adminUser = adminUsers[0];
+      
+      // Check password - support both password_hash (bcrypt) and password (plain text for migration)
+      let passwordValid = false;
+      
+      if (adminUser.password_hash) {
+        // Use bcrypt to compare with hashed password
+        try {
+          passwordValid = await bcrypt.compare(password, adminUser.password_hash);
+        } catch (bcryptError) {
+          console.error('Error comparing password with bcrypt:', bcryptError);
+          passwordValid = false;
+        }
+      } else if (adminUser.password) {
+        // Fallback to plain text comparison (for migration purposes)
+        passwordValid = adminUser.password === password;
+      } else {
+        return { success: false, error: 'Invalid email or password' };
+      }
+
+      if (!passwordValid) {
+        return { success: false, error: 'Invalid email or password' };
+      }
 
       // Update last login
       await supabase

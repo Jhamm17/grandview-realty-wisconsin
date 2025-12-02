@@ -36,27 +36,27 @@ class RateLimiter {
   }
 }
 
-// MRED API service with rate limiting
-class MREDAPIService {
+// Wisconsin MLS API service with rate limiting
+class WisconsinMLSAPIService {
   private rateLimiter = new RateLimiter();
   private supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
+    process.env.NEXT_PUBLIC_WISCONSIN_SUPABASE_URL!,
+    process.env.WISCONSIN_SUPABASE_SERVICE_ROLE_KEY!
   );
 
   private async getAccessToken(): Promise<string> {
     try {
-      // Use the existing MLSGRID_ACCESS_TOKEN from environment variables
-      const accessToken = process.env.MLSGRID_ACCESS_TOKEN;
+      // Use the Wisconsin MLS access token from environment variables
+      const accessToken = process.env.WISCONSIN_MLS_ACCESS_TOKEN;
       
       if (!accessToken) {
-        throw new Error('MLSGRID_ACCESS_TOKEN not configured');
+        throw new Error('WISCONSIN_MLS_ACCESS_TOKEN not configured');
       }
 
-      console.log('✅ Using existing MLSGRID_ACCESS_TOKEN');
+      console.log('✅ Using Wisconsin MLS access token');
       return accessToken;
     } catch (error) {
-      console.error('Error getting MRED access token:', error);
+      console.error('Error getting Wisconsin MLS access token:', error);
       throw error;
     }
   }
@@ -64,17 +64,33 @@ class MREDAPIService {
   private async makeAPIRequest<T>(endpoint: string, token: string): Promise<T> {
     await this.rateLimiter.waitForNextRequest();
 
-    const apiUrl = process.env.MRED_API_URL || 'https://api.mlsgrid.com/v2';
+    // Use Wisconsin MLS Aligned API - Endpoint per documentation
+    const apiUrl = process.env.WISCONSIN_MLS_API_URL || process.env.NEXT_PUBLIC_WISCONSIN_MLS_API_URL || 'http://aligned.metromls.com/RESO/OData';
+    const ouid = process.env.WISCONSIN_MLS_OUID || 'M00000662';
+    const appName = process.env['MLS-Aligned_User-Agent'] || process.env.WISCONSIN_MLS_APP_NAME || 'Jackson Hamm Consultant';
+    // Handle token that may or may not already include "Bearer "
+    const authToken = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
     const url = `${apiUrl}/${endpoint}`;
 
     const response = await fetch(url, {
       headers: {
-        'Authorization': `Bearer ${token}`,
+        'MLS-Aligned_User-Agent': appName,
+        'Authorization': authToken,
+        'OUID': ouid,
         'Accept': 'application/json',
       },
     });
 
     if (!response.ok) {
+      // Check for MLS Aligned error format
+      try {
+        const errorData = await response.json();
+        if (errorData.status === 'error') {
+          throw new Error(`MLS Aligned API Error: ${errorData.msg}`);
+        }
+      } catch (e) {
+        // If error response isn't JSON, use standard error
+      }
       throw new Error(`API request failed: ${response.status} - ${endpoint}`);
     }
 
@@ -88,12 +104,12 @@ class MREDAPIService {
       // Fetch Active properties using the same approach as PropertyCacheService
       console.log('🔄 Fetching Active properties using PropertyCacheService...');
       const activeProperties = await PropertyCacheService.fetchFreshActiveProperties();
-      console.log(`✅ Fetched ${activeProperties.length} Active properties from MRED API`);
+      console.log(`✅ Fetched ${activeProperties.length} Active properties from Wisconsin MLS API`);
 
       // Fetch Active Under Contract properties using the same approach as PropertyCacheService
       console.log('🔄 Fetching Active Under Contract properties using PropertyCacheService...');
       const underContractProperties = await PropertyCacheService.fetchFreshUnderContractProperties();
-      console.log(`✅ Fetched ${underContractProperties.length} Active Under Contract properties from MRED API`);
+      console.log(`✅ Fetched ${underContractProperties.length} Active Under Contract properties from Wisconsin MLS API`);
 
       // Combine all properties
       const allProperties = [...activeProperties, ...underContractProperties];
@@ -115,13 +131,13 @@ class MREDAPIService {
 
   async updateAgents(): Promise<{ success: boolean; count: number; error?: string }> {
     try {
-      console.log('🔄 Getting fresh MRED access token for agents...');
+      console.log('🔄 Getting fresh Wisconsin MLS access token for agents...');
       const token = await this.getAccessToken();
 
-      console.log('🔄 Fetching agents from MRED API...');
+      console.log('🔄 Fetching agents from Wisconsin MLS API...');
       const agents = await this.makeAPIRequest<{ value: any[] }>('Member?$filter=MemberType eq \'Agent\'&$top=1000&$select=MemberKey,MemberFirstName,MemberLastName,MemberEmail,MemberPreferredPhone,OfficeKey,OfficeName', token);
       
-      console.log(`✅ Fetched ${agents.value.length} agents from MRED API`);
+      console.log(`✅ Fetched ${agents.value.length} agents from Wisconsin MLS API`);
 
       // Clear existing agent cache
       await AgentCacheService.clearAllAgentCache();
@@ -163,13 +179,13 @@ class MREDAPIService {
 
   async updateOffices(): Promise<{ success: boolean; count: number; error?: string }> {
     try {
-      console.log('🔄 Getting fresh MRED access token for offices...');
+      console.log('🔄 Getting fresh Wisconsin MLS access token for offices...');
       const token = await this.getAccessToken();
 
-      console.log('🔄 Fetching offices from MRED API...');
+      console.log('🔄 Fetching offices from Wisconsin MLS API...');
       const offices = await this.makeAPIRequest<{ value: any[] }>('Office?$top=1000&$select=OfficeKey,OfficeName,OfficeAddress1,OfficeCity,OfficeStateOrProvince,OfficePostalCode,OfficePhone', token);
       
-      console.log(`✅ Fetched ${offices.value.length} offices from MRED API`);
+      console.log(`✅ Fetched ${offices.value.length} offices from Wisconsin MLS API`);
 
       // Update office data in Supabase if needed
       // This could be used to update office staff information
@@ -204,7 +220,7 @@ export async function GET() {
   console.log('🚀 Daily update cron job started');
 
   try {
-    const mredService = new MREDAPIService();
+    const mlsService = new WisconsinMLSAPIService();
     const results: {
       properties: { success: boolean; count: number; error?: string };
       agents: { success: boolean; count: number; error?: string };
@@ -221,15 +237,15 @@ export async function GET() {
 
     // Step 1: Update properties
     console.log('📊 Step 1: Updating properties...');
-    results.properties = await mredService.updateProperties();
+    results.properties = await mlsService.updateProperties();
 
     // Step 2: Update agents
     console.log('👥 Step 2: Updating agents...');
-    results.agents = await mredService.updateAgents();
+    results.agents = await mlsService.updateAgents();
 
     // Step 3: Update offices
     console.log('🏢 Step 3: Updating offices...');
-    results.offices = await mredService.updateOffices();
+    results.offices = await mlsService.updateOffices();
 
     // Step 4: Revalidate page caches
     console.log('🔄 Step 4: Revalidating page caches...');

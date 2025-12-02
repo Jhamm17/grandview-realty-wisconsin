@@ -53,7 +53,7 @@ export default function MissionStatement() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <span className="text-lg font-medium text-[#081d36]">Trusted by Illinois families since 2010</span>
+                <span className="text-lg font-medium text-[#081d36]">Trusted by Wisconsin families since 2017</span>
               </div>
             </div>
             
@@ -72,7 +72,7 @@ export default function MissionStatement() {
               <div className="absolute -bottom-6 -left-6 bg-white rounded-xl shadow-lg p-6 max-w-xs">
                 <div className="flex items-center space-x-3">
                   <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                  <span className="text-sm font-medium text-gray-700">Serving Illinois Communities</span>
+                  <span className="text-sm font-medium text-gray-700">Serving Wisconsin Communities</span>
                 </div>
               </div>
             </div>
@@ -98,7 +98,7 @@ export default function MissionStatement() {
               <div className="bg-gradient-to-r from-[#081d36]/10 to-[#081d36]/5 rounded-2xl p-8">
                 <h3 className="text-2xl font-bold text-[#081d36] mb-4">Local Expertise</h3>
                 <p className="text-gray-700 leading-relaxed">
-                  Rooted in the communities we serve across Illinois, we strive to build lasting relationships, support local causes, and make every client feel confident and cared for throughout their real estate journey.
+                  Rooted in the communities we serve across Wisconsin, we strive to build lasting relationships, support local causes, and make every client feel confident and cared for throughout their real estate journey.
                 </p>
               </div>
               

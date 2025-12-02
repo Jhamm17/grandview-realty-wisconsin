@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Property } from '@/lib/mred/types';
 import { ClientPropertyService } from '@/lib/client-property-service';
-import Image from 'next/image';
+// Using regular img tags for Supabase storage URLs
 import Link from 'next/link';
 import { cleanStatusText } from '@/lib/utils';
 
@@ -127,20 +127,11 @@ export function PropertyGrid({ city, minPrice, maxPrice, beds, baths, propertyTy
                                         preloadImg.src = firstImage.MediaURL;
                                     }
                                     
-                                    return firstImage?.MediaURL.startsWith('https://grandview-realty.jphamm2001.workers.dev/proxy') ? (
+                                    return (
                                         <img
                                             src={firstImage.MediaURL}
                                             alt={property.UnparsedAddress || 'Property'}
                                             className="w-full h-full object-cover"
-                                            loading="lazy"
-                                        />
-                                    ) : (
-                                        <Image
-                                            src={firstImage.MediaURL}
-                                            alt={property.UnparsedAddress || 'Property'}
-                                            fill
-                                            className="object-cover"
-                                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                                             loading="lazy"
                                         />
                                     );

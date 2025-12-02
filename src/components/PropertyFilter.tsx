@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Property } from '@/lib/mred/types';
-import Image from 'next/image';
+// Using regular img tags for Supabase storage URLs
 import Link from 'next/link';
 import { cleanStatusText } from '@/lib/utils';
 
@@ -331,7 +331,6 @@ export default function PropertyFilter({ initialProperties }: FilterProps) {
                   if (firstImage?.MediaURL) {
                     return (
                       <>
-                        {firstImage.MediaURL.startsWith('https://grandview-realty.jphamm2001.workers.dev/proxy') ? (
                           <img
                             src={firstImage.MediaURL}
                             alt={`${property.UnparsedAddress || 'Property'} in ${property.City}`}
@@ -344,22 +343,6 @@ export default function PropertyFilter({ initialProperties }: FilterProps) {
                               if (placeholder) { placeholder.style.display = 'flex'; }
                             }}
                           />
-                        ) : (
-                          <Image
-                            src={firstImage.MediaURL}
-                            alt={`${property.UnparsedAddress || 'Property'} in ${property.City}`}
-                            fill
-                            style={{ objectFit: "cover" }}
-                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                            loading="lazy"
-                            onError={(e) => {
-                              const target = e.target as HTMLImageElement;
-                              target.style.display = 'none';
-                              const placeholder = target.parentElement?.querySelector('.image-placeholder') as HTMLElement;
-                              if (placeholder) { placeholder.style.display = 'flex'; }
-                            }}
-                          />
-                        )}
                         <div className="image-placeholder absolute inset-0 bg-gray-200 flex items-center justify-center" style={{ display: 'none' }}>
                           <span className="text-gray-400">Image unavailable</span>
                         </div>

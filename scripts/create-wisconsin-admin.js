@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs');
 const { createClient } = require('@supabase/supabase-js');
+require('dotenv').config({ path: '.env.local' });
 
 // Wisconsin Supabase configuration
 const supabaseUrl = process.env.NEXT_PUBLIC_WISCONSIN_SUPABASE_URL;

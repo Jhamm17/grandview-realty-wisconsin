@@ -3,7 +3,16 @@ export interface Media {
   MediaKey: string;
   MediaURL: string;
   Order: number;
-  ModificationTimestamp: string;
+  ModificationTimestamp?: string;
+  MediaCategory?: string;
+  Permission?: string[];
+  LongDescription?: string;
+  ShortDescription?: string;
+  PreferredPhotoYN?: boolean;
+  MediaHTML?: string;
+  OriginatingSystemMediaKey?: string;
+  ResourceRecordID?: string;
+  ResourceRecordKey?: string;
 }
 
 export interface Property {
@@ -12,9 +21,10 @@ export interface Property {
   ListingKey: string;
   ModificationTimestamp: string;
   OriginatingSystemName: string;
-  StandardStatus: string;
+  StandardStatus?: string; // Optional - may be null, use MlsStatus as fallback
+  MlsStatus?: string; // Primary status field from API
   StandardName?: string;
-  MlgCanView: boolean;
+  MlgCanView?: boolean; // Optional - may not be in API response
 
   // Common Property Fields
   PropertyType?: string;
@@ -25,12 +35,13 @@ export interface Property {
   StreetName?: string;
   StreetSuffix?: string;
   City: string;
-  StateOrProvince: string;
+  StateOrProvince?: string; // Optional - may be null
   PostalCode: string;
   CountyOrParish?: string;
-  BedroomsTotal: number;
-  BathroomsTotalInteger: number;
-  LivingArea: number;
+  BedroomsTotal?: number; // Optional - may be null
+  BathroomsTotalInteger?: number; // Optional - may be null
+  LivingArea?: number; // Optional - use BuildingAreaTotal as fallback
+  BuildingAreaTotal?: number; // API field - use when LivingArea is null
   LotSize?: string;
   YearBuilt?: number;
 
@@ -77,6 +88,23 @@ export interface Property {
   ListOfficeName?: string;
   ListOfficeMlsId?: string;
   ListOfficeKey?: string;
+  
+  // Additional fields from API that may be useful
+  Latitude?: number;
+  Longitude?: number;
+  LotSizeAcres?: number;
+  LotSizeSquareFeet?: number;
+  GarageSpaces?: number;
+  GarageType?: string;
+  GarageYN?: boolean;
+  FireplacesTotal?: number;
+  Basement?: string;
+  Roof?: string;
+  Heating?: string;
+  Cooling?: string;
+  Sewer?: string;
+  WaterSource?: string;
+  PublicRemarks?: string; // Make optional since it may be empty
 }
 
 export interface PropertyPhoto {

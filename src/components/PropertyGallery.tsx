@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, useCallback } from 'react';
-import Image from 'next/image';
+// Using regular img tags for Supabase storage URLs
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 
 interface PropertyGalleryProps {
@@ -163,13 +163,11 @@ export default function PropertyGallery({ images, propertyAddress }: PropertyGal
                 : 'transform 0.2s ease-out'
           }}
         >
-          <Image
+          <img
             src={currentImage.MediaURL}
             alt={currentImage.MediaDescription || `${propertyAddress} - Image ${currentIndex + 1}`}
-            fill
-            className="object-cover"
-            priority={currentIndex === 0}
-            sizes="(max-width: 768px) 100vw, 50vw"
+            className="absolute inset-0 w-full h-full object-cover"
+            loading={currentIndex === 0 ? 'eager' : 'lazy'}
             style={{
               transition: isTransitioning ? 'opacity 0.3s ease-in-out' : 'opacity 0.2s ease-out'
             }}
@@ -236,12 +234,11 @@ export default function PropertyGallery({ images, propertyAddress }: PropertyGal
                     : 'border-gray-300 hover:border-gray-400 hover:shadow-md'
                 }`}
               >
-                <Image
+                <img
                   src={image.MediaURL}
                   alt={`${propertyAddress} - Thumbnail ${index + 1}`}
-                  fill
-                  className="object-cover"
-                  sizes="80px"
+                  className="absolute inset-0 w-full h-full object-cover"
+                  loading="lazy"
                 />
                 {index === currentIndex && (
                   <div className="absolute inset-0 bg-blue-500 bg-opacity-30 flex items-center justify-center">
