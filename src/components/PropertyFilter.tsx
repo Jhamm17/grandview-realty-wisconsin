@@ -56,12 +56,12 @@ function filterProperties(properties: Property[], filters: FilterState): Propert
     }
 
     // Bedrooms filter
-    if (filters.beds && property.BedroomsTotal < parseInt(filters.beds)) {
+    if (filters.beds && (property.BedroomsTotal ?? 0) < parseInt(filters.beds)) {
       return false;
     }
 
     // Bathrooms filter
-    if (filters.baths && property.BathroomsTotalInteger < parseInt(filters.baths)) {
+    if (filters.baths && (property.BathroomsTotalInteger ?? 0) < parseInt(filters.baths)) {
       return false;
     }
 
