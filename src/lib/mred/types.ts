@@ -63,8 +63,8 @@ export interface Property {
   ArchitecturalStyle?: string[];
   CommunityFeatures?: string[];
   ConstructionMaterials?: string[];
-  Cooling?: string[];
-  Heating?: string[];
+  Cooling?: string[]; // Array for features list
+  Heating?: string[]; // Array for features list
   InteriorFeatures?: string[];
   ExteriorFeatures?: string[];
   ParkingFeatures?: string[];
@@ -99,8 +99,6 @@ export interface Property {
   FireplacesTotal?: number;
   Basement?: string;
   Roof?: string;
-  Heating?: string;
-  Cooling?: string;
   Sewer?: string;
   WaterSource?: string;
   PublicRemarks?: string; // Make optional since it may be empty
