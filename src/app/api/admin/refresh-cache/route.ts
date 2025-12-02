@@ -4,6 +4,10 @@ import { AgentCacheService } from '@/lib/agent-cache';
 import { AdminAuthService } from '@/lib/admin-auth';
 import { revalidatePath } from 'next/cache';
 
+// Mark this route as dynamic to prevent build-time static generation
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 // Rate limiting for cache refresh (prevent multiple simultaneous refreshes)
 let lastRefreshTime = 0;
 const MIN_REFRESH_INTERVAL = 60 * 1000; // 1 minute minimum between refreshes
