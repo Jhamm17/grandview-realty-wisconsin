@@ -4,13 +4,6 @@ import { useState, useRef, useEffect } from 'react';
 
 const testimonials = [
   {
-    id: 1,
-    quote: "Their team genuinely enjoyed and appreciated my one of a kind house... Not only were the agents knowledgeable about the mechanics and design of the house, they were patient and perseverant, employing various sales tactics. Additionally, I had an absolutely amazing video of the house which really advertised its one of a kind features and amazing architectural structure.",
-    author: "Kristina R.",
-    role: "Satisfied Seller",
-    initial: "K"
-  },
-  {
     id: 2,
     quote: "As a seller, if you want a team who is willing to put the time and effort into really knowing your house, especially if you have a difficult house to sell, Grandview Realty is the company to use!",
     author: "Chris P.",
