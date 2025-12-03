@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import ContactForm from '@/components/ContactForm';
 
 export default function LookingToSell() {
@@ -7,18 +6,13 @@ export default function LookingToSell() {
       {/* Hero Section */}
       <section className="relative h-[40vh] min-h-[400px] flex items-center">
         <div className="absolute inset-0 z-0">
-          <div className="relative w-full h-full">
-            <Image
-              src="/contactbg.png"
-              alt="Contact Grandview Realty"
-              fill
-              style={{ objectFit: "cover", objectPosition: "center center" }}
-              priority
-              quality={75}
-              sizes="100vw"
-            />
-            <div className="absolute inset-0 bg-[#081d36]/70" />
-          </div>
+          <img
+            src="/contactbg.png"
+            alt="Contact Grandview Realty"
+            className="w-full h-full object-cover"
+            style={{ objectPosition: "center center" }}
+          />
+          <div className="absolute inset-0 bg-[#081d36]/70" />
         </div>
         <div className="container-padding relative z-10 text-center">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
@@ -102,14 +96,6 @@ export default function LookingToSell() {
               
               <div className="space-y-8">
                 <div>
-                  <h3 className="text-lg font-semibold mb-2">Main Office</h3>
-                  <p className="text-gray-600">
-                    501 West State Street Suite 103<br />
-                    Geneva, IL 60134
-                  </p>
-                </div>
-
-                <div>
                   <h3 className="text-lg font-semibold mb-2">Contact Information</h3>
                   <p className="text-gray-600">
                     Phone: <a href="tel:630-423-7989" className="text-primary hover:underline">630-423-7989</a><br />
@@ -128,7 +114,7 @@ export default function LookingToSell() {
                   <h3 className="text-lg font-semibold mb-2">Follow Us</h3>
                   <div className="flex space-x-4">
                     <a 
-                      href="https://www.facebook.com/GrandviewRealtyGeneva/" 
+                      href="https://www.facebook.com/people/Grandview-Realty-Wisconsin/61583508907484/" 
                       className="text-gray-600 hover:text-primary transition-colors" 
                       aria-label="Facebook"
                       target="_blank"
@@ -139,7 +125,7 @@ export default function LookingToSell() {
                       </svg>
                     </a>
                     <a 
-                      href="https://www.instagram.com/grandviewrealtygeneva/" 
+                      href="https://www.instagram.com/grandviewrealtywi/" 
                       className="text-gray-600 hover:text-primary transition-colors" 
                       aria-label="Instagram"
                       target="_blank"
@@ -152,33 +138,6 @@ export default function LookingToSell() {
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Map Section */}
-      <section className="py-16 bg-[#081d36]">
-        <div className="container-padding">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-white mb-4">Find Us</h2>
-            <p className="text-white/80 text-lg">
-              501 West State Street Suite 103, Geneva, IL 60134
-            </p>
-          </div>
-          
-          <div className="max-w-4xl mx-auto">
-            <div className="bg-white rounded-lg shadow-xl overflow-hidden">
-              <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2970.1234567890123!2d-88.3054!3d41.8856!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x880f4b3b3b3b3b3b%3A0x1234567890123456!2s501%20W%20State%20St%20Suite%20103%2C%20Geneva%2C%20IL%2060134!5e0!3m2!1sen!2sus!4v1234567890123"
-                width="100%"
-                height="450"
-                style={{ border: 0 }}
-                allowFullScreen
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                title="Grandview Realty Location"
-              ></iframe>
             </div>
           </div>
         </div>
