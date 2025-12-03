@@ -129,7 +129,7 @@ export default function AffiliationsPage() {
                 </div>
                 <h3 className="text-lg font-semibold mb-2">Top Producer Award</h3>
                 <p className="text-sm text-gray-600">
-                  Recognized for exceptional sales performance and outstanding client service in the Chicagoland market.
+                  Recognized for exceptional sales performance and outstanding client service in Wisconsin.
                 </p>
               </div>
 
@@ -157,7 +157,7 @@ export default function AffiliationsPage() {
             <h2 className="text-2xl font-semibold mb-4">Our Commitment to Excellence</h2>
             <p className="text-lg mb-6">
               These affiliations and accreditations reflect our ongoing commitment to providing the highest level of 
-              professional service to our clients throughout the Chicagoland area.
+              professional service to our clients throughout Wisconsin.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
               <div>
