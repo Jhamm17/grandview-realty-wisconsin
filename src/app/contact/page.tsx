@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import ContactForm from '@/components/ContactForm';
 
 export default function Contact() {
@@ -8,14 +7,11 @@ export default function Contact() {
       <section className="relative h-[40vh] min-h-[400px] flex items-center">
         <div className="absolute inset-0 z-0">
           <div className="relative w-full h-full">
-            <Image
+            <img
               src="/contactbg.png"
               alt="Contact Grandview Realty"
-              fill
-              style={{ objectFit: "cover", objectPosition: "center center" }}
-              priority
-              quality={75}
-              sizes="100vw"
+              className="w-full h-full object-cover"
+              style={{ objectPosition: "center center" }}
             />
             <div className="absolute inset-0 bg-[#081d36]/70" />
           </div>
