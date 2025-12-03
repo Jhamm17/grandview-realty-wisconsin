@@ -370,7 +370,7 @@ export function Footer() {
         {/* BBB and Social Media - Bottom Right Corner */}
         <div className="mt-8 md:mt-12 flex justify-end items-center space-x-6">
           {/* BBB Accreditation */}
-          <div>
+          {/* <div>
             <a 
               href="https://www.bbb.org/us/il/geneva/profile/real-estate-broker/grandview-realty-0654-90017168" 
               target="_blank" 
@@ -385,7 +385,7 @@ export function Footer() {
                 className="h-12 md:h-16 w-auto"
               />
             </a>
-          </div>
+          </div> */}
 
           {/* Social Media Icons */}
           <div className="flex space-x-3">

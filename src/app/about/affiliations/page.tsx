@@ -20,7 +20,7 @@ export default function AffiliationsPage() {
         </p>
 
         {/* BBB Accreditation Section */}
-        <section className="mb-16">
+        {/* <section className="mb-16">
           <div className="bg-white rounded-lg shadow-lg p-8">
             <h2 className="text-2xl font-semibold mb-6 text-center">BBB Accreditation</h2>
             <div className="flex flex-col md:flex-row items-center justify-center gap-8">
@@ -56,7 +56,7 @@ export default function AffiliationsPage() {
               </div>
             </div>
           </div>
-        </section>
+        </section> */}
 
         {/* Professional Associations Section */}
         <section className="mb-16">
