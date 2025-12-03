@@ -44,7 +44,7 @@ export default function LookingToBuy() {
                     label: 'Preferred Location',
                     type: 'text',
                     required: true,
-                    placeholder: 'e.g., Geneva, St. Charles, Batavia'
+                    placeholder: 'Milwaukee • Madison • Green Bay • Kenosha'
                   },
                   {
                     name: 'budget',
