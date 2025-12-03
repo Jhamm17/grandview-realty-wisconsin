@@ -66,8 +66,28 @@ function filterProperties(properties: Property[], filters: FilterState): Propert
     }
 
     // Property type filter (if we have this data)
-    if (filters.propertyType && property.PropertyType !== filters.propertyType) {
-      return false;
+    // Map filter values to property types:
+    // - "Residential" matches "Single-Family"
+    // - "Condo" matches "Condominium"
+    // - "Multi-Family" matches "Two-Family"
+    if (filters.propertyType) {
+      const propertyType = property.PropertyType || '';
+      const filterValue = filters.propertyType;
+      
+      // Check exact match first
+      if (propertyType === filterValue) {
+        // Exact match, continue
+      } else {
+        // Check mapped values
+        const matches = 
+          (filterValue === 'Residential' && propertyType === 'Single-Family') ||
+          (filterValue === 'Condo' && propertyType === 'Condominium') ||
+          (filterValue === 'Multi-Family' && propertyType === 'Two-Family');
+        
+        if (!matches) {
+          return false;
+        }
+      }
     }
 
     return true;
