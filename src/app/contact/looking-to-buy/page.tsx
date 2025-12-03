@@ -97,8 +97,8 @@ export default function LookingToBuy() {
                 <div>
                   <h3 className="text-lg font-semibold mb-2">Contact Information</h3>
                   <p className="text-gray-600">
-                    Phone: <a href="tel:630-423-7989" className="text-primary hover:underline">630-423-7989</a><br />
-                    Email: <a href="mailto:info@grandviewsells.com" className="text-primary hover:underline">info@grandviewsells.com</a>
+                    Phone: <a href="tel:920-939-8003" className="text-primary hover:underline">920-939-8003</a><br />
+                    Email: <a href="mailto:GVRWisconsin@grandviewsells.com" className="text-primary hover:underline">GVRWisconsin@grandviewsells.com</a>
                   </p>
                 </div>
 
