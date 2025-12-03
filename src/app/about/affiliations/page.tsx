@@ -105,7 +105,7 @@ export default function AffiliationsPage() {
                 </div>
                 <h3 className="text-lg font-semibold mb-2">Local Real Estate Associations</h3>
                 <p className="text-sm text-gray-600">
-                  Active member of local and regional real estate associations serving the Chicagoland area.
+                  Active member of local and regional real estate associations serving Wisconsin.
                 </p>
               </div>
             </div>
