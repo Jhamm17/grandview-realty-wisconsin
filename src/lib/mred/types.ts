@@ -42,6 +42,10 @@ export interface Property {
   BathroomsTotalInteger?: number; // Optional - may be null
   LivingArea?: number; // Optional - use BuildingAreaTotal as fallback
   BuildingAreaTotal?: number; // API field - use when LivingArea is null
+  // Fallback fields for two-family properties
+  Property_sp_Information_co_Bedrooms_sp_U2?: number; // Unit 2 bedrooms fallback
+  Property_sp_Information_co_Full_sp_Baths_sp_U2?: number; // Unit 2 bathrooms fallback
+  Property_sp_Information_co_Est_sp_Total_sp_Sq_sp_Ft?: number; // Total square footage fallback
   LotSize?: string;
   YearBuilt?: number;
 

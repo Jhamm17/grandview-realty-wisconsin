@@ -33,10 +33,28 @@ class WisconsinMLSService {
      */
     private transformProperty(apiProperty: any): Property {
         // Map BuildingAreaTotal to LivingArea if LivingArea is null/undefined
-        const livingArea = apiProperty.LivingArea ?? apiProperty.BuildingAreaTotal ?? 0;
+        let livingArea = apiProperty.LivingArea ?? apiProperty.BuildingAreaTotal ?? 0;
         
         // Map MlsStatus to StandardStatus if StandardStatus is null/undefined
         const standardStatus = apiProperty.StandardStatus ?? apiProperty.MlsStatus ?? 'Unknown';
+        
+        // For two-family properties, use fallback fields if main fields are null
+        const isTwoFamily = apiProperty.PropertyType === 'Two-Family';
+        let bedroomsTotal = apiProperty.BedroomsTotal;
+        let bathroomsTotalInteger = apiProperty.BathroomsTotalInteger;
+        
+        if (isTwoFamily) {
+            // Use fallback fields for two-family properties when main fields are null
+            if (!bedroomsTotal && apiProperty['Property_sp_Information_co_Bedrooms_sp_U2']) {
+                bedroomsTotal = apiProperty['Property_sp_Information_co_Bedrooms_sp_U2'];
+            }
+            if (!bathroomsTotalInteger && apiProperty['Property_sp_Information_co_Full_sp_Baths_sp_U2']) {
+                bathroomsTotalInteger = apiProperty['Property_sp_Information_co_Full_sp_Baths_sp_U2'];
+            }
+            if (!livingArea && apiProperty['Property_sp_Information_co_Est_sp_Total_sp_Sq_sp_Ft']) {
+                livingArea = apiProperty['Property_sp_Information_co_Est_sp_Total_sp_Sq_sp_Ft'];
+            }
+        }
         
         // Transform Media array if present
         const media = apiProperty.Media?.map((m: any) => ({
@@ -72,8 +90,12 @@ class WisconsinMLSService {
             PostalCode: apiProperty.PostalCode || '',
             ListPrice: apiProperty.ListPrice || 0,
             PublicRemarks: apiProperty.PublicRemarks || '',
-            BedroomsTotal: apiProperty.BedroomsTotal ?? 0,
-            BathroomsTotalInteger: apiProperty.BathroomsTotalInteger ?? 0,
+            BedroomsTotal: bedroomsTotal ?? 0,
+            BathroomsTotalInteger: bathroomsTotalInteger ?? 0,
+            // Store fallback fields for reference
+            Property_sp_Information_co_Bedrooms_sp_U2: apiProperty['Property_sp_Information_co_Bedrooms_sp_U2'],
+            Property_sp_Information_co_Full_sp_Baths_sp_U2: apiProperty['Property_sp_Information_co_Full_sp_Baths_sp_U2'],
+            Property_sp_Information_co_Est_sp_Total_sp_Sq_sp_Ft: apiProperty['Property_sp_Information_co_Est_sp_Total_sp_Sq_sp_Ft'],
         };
     }
 
@@ -101,7 +123,7 @@ class WisconsinMLSService {
             // Standard OData endpoint construction
             url = params ? 
                 `${baseUrl}/${endpoint}?${params.toString()}` :
-                `${baseUrl}/${endpoint}`;
+            `${baseUrl}/${endpoint}`;
         }
 
         // Get all required headers for MLS Aligned API
@@ -417,7 +439,7 @@ class WisconsinMLSService {
         const selectFields = params.select?.length 
             ? params.select.filter(f => f !== 'Media')
             : defaultFields;
-        
+
         queryParams.append('$select', selectFields.join(','));
         queryParams.append('$expand', 'Media');
 
@@ -551,10 +573,10 @@ class WisconsinMLSService {
                 
                 // More pages to fetch - increment skip for next page
                 skip = nextSkip;
-                hasMore = true;
-                
-                // Rate limiting - wait between requests
-                await new Promise(resolve => setTimeout(resolve, 500)); // 500ms between requests
+                    hasMore = true;
+                    
+                    // Rate limiting - wait between requests
+                    await new Promise(resolve => setTimeout(resolve, 500)); // 500ms between requests
             } catch (error) {
                 console.error(`[Wisconsin MLS] Error on page ${pageCount}:`, error);
                 // If we have some properties, return what we have
