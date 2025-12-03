@@ -108,33 +108,6 @@ export default function Contact() {
           </div>
         </div>
       </section>
-
-      {/* Map Section */}
-      <section className="py-16 bg-[#081d36]">
-        <div className="container-padding">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-white mb-4">Find Us</h2>
-            <p className="text-white/80 text-lg">
-              501 West State Street Suite 103, Geneva, IL 60134
-            </p>
-          </div>
-          
-          <div className="max-w-4xl mx-auto">
-            <div className="bg-white rounded-lg shadow-xl overflow-hidden">
-              <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2970.1234567890123!2d-88.3054!3d41.8856!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x880f4b3b3b3b3b3b%3A0x1234567890123456!2s501%20W%20State%20St%20Suite%20103%2C%20Geneva%2C%20IL%2060134!5e0!3m2!1sen!2sus!4v1234567890123"
-                width="100%"
-                height="350"
-                style={{ border: 0 }}
-                allowFullScreen
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                title="Grandview Realty Location"
-              ></iframe>
-            </div>
-          </div>
-        </div>
-      </section>
     </div>
   );
 } 
