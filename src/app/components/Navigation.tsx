@@ -390,7 +390,7 @@ export function Footer() {
           {/* Social Media Icons */}
           <div className="flex space-x-3">
             <a 
-              href="https://www.facebook.com/GrandviewRealtyWisconsin/" 
+              href="https://www.facebook.com/people/Grandview-Realty-Wisconsin/61583508907484/" 
               className="text-white/80 hover:text-[#60a5fa] transition-colors" 
               aria-label="Facebook"
               target="_blank"
