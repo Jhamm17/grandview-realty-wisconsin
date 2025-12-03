@@ -401,7 +401,7 @@ export function Footer() {
               </svg>
             </a>
             <a 
-              href="https://www.instagram.com/grandviewrealtywisconsin/" 
+              href="https://www.instagram.com/grandviewrealtywi/" 
               className="text-white/80 hover:text-[#60a5fa] transition-colors" 
               aria-label="Instagram"
               target="_blank"
