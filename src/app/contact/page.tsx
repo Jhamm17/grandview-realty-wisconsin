@@ -54,14 +54,6 @@ export default function Contact() {
               
               <div className="space-y-8">
                 <div>
-                  <h3 className="text-lg font-semibold mb-2">Main Office</h3>
-                  <p className="text-gray-600">
-                    501 West State Street Suite 103<br />
-                    Geneva, IL 60134
-                  </p>
-                </div>
-
-                <div>
                   <h3 className="text-lg font-semibold mb-2">Contact Information</h3>
                   <p className="text-gray-600">
                     Phone: <a href="tel:630-423-7989" className="text-primary hover:underline">630-423-7989</a><br />
@@ -80,7 +72,7 @@ export default function Contact() {
                   <h3 className="text-lg font-semibold mb-2">Follow Us</h3>
                   <div className="flex space-x-4">
                     <a 
-                      href="https://www.facebook.com/GrandviewRealtyGeneva/" 
+                      href="https://www.facebook.com/people/Grandview-Realty-Wisconsin/61583508907484/" 
                       className="text-gray-600 hover:text-primary transition-colors" 
                       aria-label="Facebook"
                       target="_blank"
@@ -91,7 +83,7 @@ export default function Contact() {
                       </svg>
                     </a>
                     <a 
-                      href="https://www.instagram.com/grandviewrealtygeneva/" 
+                      href="https://www.instagram.com/grandviewrealtywi/" 
                       className="text-gray-600 hover:text-primary transition-colors" 
                       aria-label="Instagram"
                       target="_blank"
