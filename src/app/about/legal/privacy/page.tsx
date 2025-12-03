@@ -54,9 +54,9 @@ export default async function PrivacyPolicy() {
           <p>
             If you have any questions about this Privacy Policy, please contact us at:
             <br />
-            Email: privacy@grandviewrealty.com
+            Email: <a href="mailto:GVRWisconsin@grandviewsells.com" className="text-primary hover:underline">GVRWisconsin@grandviewsells.com</a>
             <br />
-            Phone: (555) 123-4567
+            Phone: <a href="tel:920-939-8003" className="text-primary hover:underline">920-939-8003</a>
           </p>
         </section>
       </div>
