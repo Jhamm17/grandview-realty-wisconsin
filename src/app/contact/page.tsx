@@ -6,15 +6,13 @@ export default function Contact() {
       {/* Hero Section */}
       <section className="relative h-[40vh] min-h-[400px] flex items-center">
         <div className="absolute inset-0 z-0">
-          <div className="relative w-full h-full">
-            <img
-              src="/contactbg.png"
-              alt="Contact Grandview Realty"
-              className="w-full h-full object-cover"
-              style={{ objectPosition: "center center" }}
-            />
-            <div className="absolute inset-0 bg-[#081d36]/70" />
-          </div>
+          <img
+            src="/contactbg.png"
+            alt="Contact Grandview Realty"
+            className="w-full h-full object-cover"
+            style={{ objectPosition: "center center" }}
+          />
+          <div className="absolute inset-0 bg-[#081d36]/70" />
         </div>
         <div className="container-padding relative z-10 text-center">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
