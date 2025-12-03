@@ -49,8 +49,11 @@ export default async function AgentPage({ params }: { params: { id: string } }) 
                 className={`w-full h-full rounded-lg ${
                   agent.slug === 'sam-tousi' || agent.slug === 'adam-turner' 
                     ? 'object-contain' 
+                    : agent.slug === 'chris-clark'
+                    ? 'object-cover'
                     : 'object-cover object-bottom'
                 }`}
+                style={agent.slug === 'chris-clark' ? { objectPosition: 'center 25%' } : undefined}
               />
             ) : agent.logo_url ? (
               // Show logo for agents without headshots (Christopher Lobrillo and Lynda Werner)
