@@ -372,7 +372,7 @@ export function Footer() {
           {/* BBB Accreditation */}
           <div>
             <a 
-              href="https://www.bbb.org/us/wi/milwaukee/profile/real-estate-broker/grandview-realty-wisconsin" 
+              href="https://www.bbb.org/us/il/geneva/profile/real-estate-broker/grandview-realty-0654-90017168" 
               target="_blank" 
               rel="noopener noreferrer"
               className="inline-block hover:opacity-80 transition-opacity"
