@@ -7,10 +7,23 @@ import { revalidatePath } from 'next/cache';
 // Mark this route as dynamic to prevent build-time static generation
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
+export const maxDuration = 60; // Maximum execution time: 60 seconds (Vercel Pro plan limit)
 
 // Rate limiting for cache refresh (prevent multiple simultaneous refreshes)
 let lastRefreshTime = 0;
 const MIN_REFRESH_INTERVAL = 60 * 1000; // 1 minute minimum between refreshes
+
+// Timeout wrapper to prevent function from exceeding limits
+async function withTimeout<T>(
+  promise: Promise<T>,
+  timeoutMs: number,
+  errorMessage: string
+): Promise<T> {
+  const timeoutPromise = new Promise<T>((_, reject) => {
+    setTimeout(() => reject(new Error(errorMessage)), timeoutMs);
+  });
+  return Promise.race([promise, timeoutPromise]);
+}
 
 // Shared function for both GET and POST requests
 async function refreshCache(isCronJob: boolean, adminEmail?: string) {
@@ -44,33 +57,51 @@ async function refreshCache(isCronJob: boolean, adminEmail?: string) {
       totalDuration: 0
     };
 
-    // Step 1: Clear and refresh property cache
+    // Step 1: Clear and refresh property cache (with timeout protection)
     console.log('🗑️ Clearing property cache...');
     try {
       await PropertyCacheService.clearCache();
       
       console.log('🔄 Fetching fresh properties from MLS API...');
-      const properties = await PropertyCacheService.getAllProperties();
+      // Set timeout to 45 seconds for property cache refresh (leave buffer for other operations)
+      const properties = await withTimeout(
+        PropertyCacheService.getAllProperties(),
+        45000,
+        'Property cache refresh timed out after 45 seconds'
+      );
       
       results.propertyCache = { success: true, count: properties.length };
       console.log(`✅ Property cache refreshed! Loaded ${properties.length} properties`);
     } catch (error) {
       console.error('❌ Error refreshing property cache:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      if (errorMessage.includes('timed out')) {
+        console.error('⏱️ Property cache refresh exceeded timeout limit');
+      }
       results.propertyCache = { success: false, count: 0 };
     }
 
-    // Step 2: Clear and refresh agent cache
+    // Step 2: Clear and refresh agent cache (with timeout protection)
     console.log('🗑️ Clearing agent cache...');
     try {
       await AgentCacheService.clearAllAgentCache();
       
       console.log('🔄 Fetching fresh agent data...');
-      const agents = await AgentCacheService.getAllAgents();
+      // Set timeout to 10 seconds for agent cache refresh
+      const agents = await withTimeout(
+        AgentCacheService.getAllAgents(),
+        10000,
+        'Agent cache refresh timed out after 10 seconds'
+      );
       
       results.agentCache = { success: true, count: agents.length };
       console.log(`✅ Agent cache refreshed! Loaded ${agents.length} agents`);
     } catch (error) {
       console.error('❌ Error refreshing agent cache:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      if (errorMessage.includes('timed out')) {
+        console.error('⏱️ Agent cache refresh exceeded timeout limit');
+      }
       results.agentCache = { success: false, count: 0 };
     }
 
@@ -140,13 +171,51 @@ export async function GET(request: NextRequest) {
     
     console.log('🔍 GET handler called for /api/admin/refresh-cache (external cron)');
     
-    const result = await refreshCache(true);
-    return NextResponse.json(result);
+    // For cron jobs, wrap in timeout to prevent exceeding Vercel limits
+    // Use 55 seconds to leave buffer before Vercel's 60s limit
+    try {
+      const result = await withTimeout(
+        refreshCache(true),
+        55000,
+        'Cache refresh exceeded maximum execution time (55 seconds)'
+      );
+      return NextResponse.json(result);
+    } catch (timeoutError) {
+      // If timeout occurs, return partial success response
+      // The cache refresh may have partially completed
+      console.error('⏱️ Cache refresh timed out, but may have partially completed');
+      return NextResponse.json(
+        { 
+          success: false,
+          message: 'Cache refresh timed out - may have partially completed',
+          error: timeoutError instanceof Error ? timeoutError.message : 'Timeout error',
+          timestamp: new Date().toISOString(),
+          triggeredBy: 'cron-job'
+        },
+        { status: 202 } // 202 Accepted - request accepted but not completed
+      );
+    }
 
   } catch (error) {
     console.error('❌ Error in GET refresh-cache:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    
+    // If it's a timeout, return 202 instead of 500
+    if (errorMessage.includes('timeout') || errorMessage.includes('exceeded')) {
+      return NextResponse.json(
+        { 
+          success: false,
+          message: 'Cache refresh timed out - may have partially completed',
+          error: errorMessage,
+          timestamp: new Date().toISOString(),
+          triggeredBy: 'cron-job'
+        },
+        { status: 202 }
+      );
+    }
+    
     return NextResponse.json(
-      { error: 'Failed to refresh cache', details: error instanceof Error ? error.message : 'Unknown error' },
+      { error: 'Failed to refresh cache', details: errorMessage },
       { status: 500 }
     );
   }
@@ -174,8 +243,28 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const result = await refreshCache(false, adminEmail);
-    return NextResponse.json(result);
+    // For manual requests, also add timeout protection
+    try {
+      const result = await withTimeout(
+        refreshCache(false, adminEmail),
+        55000,
+        'Cache refresh exceeded maximum execution time (55 seconds)'
+      );
+      return NextResponse.json(result);
+    } catch (timeoutError) {
+      // If timeout occurs, return partial success response
+      console.error('⏱️ Cache refresh timed out, but may have partially completed');
+      return NextResponse.json(
+        { 
+          success: false,
+          message: 'Cache refresh timed out - may have partially completed',
+          error: timeoutError instanceof Error ? timeoutError.message : 'Timeout error',
+          timestamp: new Date().toISOString(),
+          triggeredBy: 'admin'
+        },
+        { status: 202 } // 202 Accepted - request accepted but not completed
+      );
+    }
 
   } catch (error) {
     console.error('❌ Error in POST refresh-cache:', error);
@@ -194,8 +283,23 @@ export async function POST(request: NextRequest) {
       );
     }
     
+    // Handle timeout errors
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    if (errorMessage.includes('timeout') || errorMessage.includes('exceeded')) {
+      return NextResponse.json(
+        { 
+          success: false,
+          message: 'Cache refresh timed out - may have partially completed',
+          error: errorMessage,
+          timestamp: new Date().toISOString(),
+          triggeredBy: 'admin'
+        },
+        { status: 202 }
+      );
+    }
+    
     return NextResponse.json(
-      { error: 'Failed to refresh cache', details: error instanceof Error ? error.message : 'Unknown error' },
+      { error: 'Failed to refresh cache', details: errorMessage },
       { status: 500 }
     );
   }
