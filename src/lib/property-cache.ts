@@ -190,9 +190,15 @@ export class PropertyCacheService {
         }
       }
 
-      // Cache miss or stale, fetch from API (like during deployment)
-      console.log('[Cache] Cache miss or stale, fetching all properties from API');
-      const properties = await this.fetchAllPropertiesFromAPI();
+      // Cache miss or stale - don't fetch during page render (takes too long)
+      // Return empty array and let the cron job populate the cache
+      console.log('[Cache] Cache miss or stale - returning empty array');
+      console.log('[Cache] Cache will be populated by the scheduled cron job');
+      return [];
+      
+      // Note: Removed automatic API fetch during page render because it takes ~20 minutes
+      // The cron job will populate the cache automatically
+      // const properties = await this.fetchAllPropertiesFromAPI();
       
       console.log(`[Cache] Fetched ${properties.length} properties from API`);
       
