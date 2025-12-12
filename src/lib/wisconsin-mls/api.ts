@@ -463,12 +463,12 @@ class WisconsinMLSService {
 
     /**
      * Get all properties with pagination
-     * Requests 50 records per request
+     * Requests 25 records per request (MLS Aligned API max limit)
      */
     public async getAllProperties(): Promise<Property[]> {
         const allProperties: Property[] = [];
         let skip = 0;
-        const top = 50; // Request 50 properties per page
+        const top = WISCONSIN_MLS_CONFIG.RECORDS_PER_PAGE; // Use config value (25 - API max limit)
         let hasMore = true;
         let pageCount = 0;
         const maxPages = 500; // Safety limit to prevent infinite loops
@@ -557,10 +557,22 @@ class WisconsinMLSService {
                 const receivedCount = data.value.length;
                 
                 // Stop if we got fewer than requested (last page)
+                // Note: API might return fewer than requested even if more exist, so we also check totalCount
                 if (receivedCount < top) {
-                    console.log(`[Wisconsin MLS] Received ${receivedCount} < ${top} properties, this is the last page`);
-                    hasMore = false;
-                    break;
+                    console.log(`[Wisconsin MLS] Received ${receivedCount} < ${top} properties, checking if more exist...`);
+                    // If we got fewer than requested AND we've reached the total count, stop
+                    const totalCount = data['@odata.count'] || 0;
+                    if (totalCount > 0 && (skip + receivedCount) >= totalCount) {
+                        console.log(`[Wisconsin MLS] Reached total count, this is the last page`);
+                        hasMore = false;
+                        break;
+                    }
+                    // If no total count available and we got fewer than requested, assume last page
+                    if (totalCount === 0 && receivedCount < top) {
+                        console.log(`[Wisconsin MLS] No total count available and received ${receivedCount} < ${top}, assuming last page`);
+                        hasMore = false;
+                        break;
+                    }
                 }
                 
                 // Check if we've fetched all properties
@@ -573,10 +585,12 @@ class WisconsinMLSService {
                 
                 // More pages to fetch - increment skip for next page
                 skip = nextSkip;
-                    hasMore = true;
-                    
-                    // Rate limiting - wait between requests
-                    await new Promise(resolve => setTimeout(resolve, 500)); // 500ms between requests
+                hasMore = true;
+                
+                // Rate limiting - wait between requests (2 requests per second = 500ms minimum)
+                // Using config value for consistency
+                const rateLimitDelay = 1000 / WISCONSIN_MLS_CONFIG.MAX_REQUESTS_PER_SECOND;
+                await new Promise(resolve => setTimeout(resolve, rateLimitDelay));
             } catch (error) {
                 console.error(`[Wisconsin MLS] Error on page ${pageCount}:`, error);
                 // If we have some properties, return what we have

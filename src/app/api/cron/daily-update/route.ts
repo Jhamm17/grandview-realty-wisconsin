@@ -222,6 +222,17 @@ class WisconsinMLSAPIService {
 export async function GET() {
   const startTime = Date.now();
   console.log('🚀 Daily update cron job started');
+  console.log(`⏰ Start time: ${new Date().toISOString()}`);
+  
+  // Vercel execution time limits:
+  // - Hobby: 10 seconds
+  // - Pro: 60 seconds  
+  // - Enterprise: 5 minutes max
+  // If your script normally takes 20+ minutes, consider using an external cron service
+  const MAX_EXECUTION_TIME = 4.5 * 60 * 1000; // 4.5 minutes (safety margin for 5min limit)
+  const timeoutId = setTimeout(() => {
+    console.error('⏱️ CRON JOB TIMEOUT: Execution exceeded maximum time limit');
+  }, MAX_EXECUTION_TIME);
 
   try {
     const mlsService = new WisconsinMLSAPIService();
@@ -240,8 +251,12 @@ export async function GET() {
     };
 
     // Step 1: Update properties
+    const propertiesStartTime = Date.now();
     console.log('📊 Step 1: Updating properties...');
+    console.log('⚠️  NOTE: This may take several minutes if fetching many properties from API');
     results.properties = await mlsService.updateProperties();
+    const propertiesDuration = Date.now() - propertiesStartTime;
+    console.log(`⏱️  Properties update took ${(propertiesDuration / 1000).toFixed(2)} seconds`);
 
     // Step 2: Update agents
     console.log('👥 Step 2: Updating agents...');
@@ -276,6 +291,7 @@ export async function GET() {
     }
 
     // Calculate total duration
+    clearTimeout(timeoutId);
     results.totalDuration = Date.now() - startTime;
 
     const overallSuccess = results.properties.success && 
@@ -284,27 +300,38 @@ export async function GET() {
                           results.pageCache.success;
 
     console.log(`🎯 Daily update completed!`);
-    console.log(`⏱️ Total duration: ${results.totalDuration}ms`);
+    console.log(`⏱️ Total duration: ${(results.totalDuration / 1000).toFixed(2)} seconds (${(results.totalDuration / 60000).toFixed(2)} minutes)`);
     console.log(`✅ Overall success: ${overallSuccess ? 'YES' : 'PARTIAL'}`);
     console.log(`📊 Properties: ${results.properties.count} updated`);
     console.log(`👥 Agents: ${results.agents.count} updated`);
     console.log(`🏢 Offices: ${results.offices.count} updated`);
+    
+    // Warn if execution took too long
+    if (results.totalDuration > MAX_EXECUTION_TIME) {
+      console.warn(`⚠️  WARNING: Execution time (${(results.totalDuration / 1000).toFixed(2)}s) exceeded recommended limit (${(MAX_EXECUTION_TIME / 1000).toFixed(2)}s)`);
+      console.warn(`⚠️  Consider using an external cron service (e.g., cron-job.org) for longer-running jobs`);
+    }
 
     return NextResponse.json({
       success: overallSuccess,
       message: 'Daily update completed successfully',
       results,
       timestamp: new Date().toISOString(),
-      triggeredBy: 'cron-job'
+      triggeredBy: 'cron-job',
+      executionTimeSeconds: (results.totalDuration / 1000).toFixed(2)
     });
 
   } catch (error) {
+    clearTimeout(timeoutId);
+    const errorDuration = Date.now() - startTime;
     console.error('❌ Error in daily update cron job:', error);
+    console.error(`⏱️  Failed after ${(errorDuration / 1000).toFixed(2)} seconds`);
     return NextResponse.json(
       { 
         error: 'Failed to complete daily update', 
         details: error instanceof Error ? error.message : 'Unknown error',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        executionTimeSeconds: (errorDuration / 1000).toFixed(2)
       },
       { status: 500 }
     );

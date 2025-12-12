@@ -4,9 +4,9 @@ import { Property } from './mred/types';
 // Lazy-initialize Supabase client to avoid build-time errors
 function getSupabaseClient() {
   return createClient(
-    process.env.NEXT_PUBLIC_WISCONSIN_SUPABASE_URL!,
-    process.env.WISCONSIN_SUPABASE_SERVICE_ROLE_KEY!
-  );
+  process.env.NEXT_PUBLIC_WISCONSIN_SUPABASE_URL!,
+  process.env.WISCONSIN_SUPABASE_SERVICE_ROLE_KEY!
+);
 }
 
 export interface Agent {
