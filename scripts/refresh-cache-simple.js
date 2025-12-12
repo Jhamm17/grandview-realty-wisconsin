@@ -12,6 +12,7 @@
  *   - CRON_SECRET (optional, for security)
  */
 
+/* eslint-disable @typescript-eslint/no-require-imports */
 const https = require('https');
 const http = require('http');
 
@@ -33,7 +34,6 @@ async function refreshCache() {
   console.log(`📡 Calling: ${apiUrl}`);
   console.log(`⏰ Started at: ${new Date().toISOString()}\n`);
 
-  const url = new URL(apiUrl);
   const options = {
     method: 'GET',
     headers: {
@@ -91,7 +91,7 @@ async function refreshCache() {
               console.error('\n❌ Failed to trigger cache refresh');
               reject(new Error(`HTTP ${res.statusCode}: ${response.message || data}`));
             }
-          } catch (e) {
+          } catch {
             console.log('📦 Response (raw):', data);
             if (res.statusCode === 202 || res.statusCode === 200) {
               console.log('\n✅ Cache refresh initiated successfully!');

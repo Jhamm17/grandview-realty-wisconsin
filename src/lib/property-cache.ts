@@ -134,17 +134,24 @@ export class PropertyCacheService {
       const supabaseAdmin = this.getSupabaseAdmin();
       if (supabaseAdmin) {
         try {
-          const result = await supabaseAdmin
+          // Add timeout to prevent hanging - wrap the entire query
+          const fetchPromise = supabaseAdmin
             .from('property_cache')
             .select('*')
             .eq('is_active', true)
             .order('last_updated', { ascending: false });
           
+          const timeoutPromise = new Promise<never>((_, reject) => {
+            setTimeout(() => reject(new Error('Cache fetch timeout after 5 seconds')), 5000);
+          });
+          
+          const result = await Promise.race([fetchPromise, timeoutPromise]);
+          
           cachedProperties = result.data;
           cacheError = result.error;
         } catch (fetchError: any) {
-          console.error('Error fetching from cache (fetch failed):', fetchError.message || fetchError);
-          // If Supabase fetch fails, continue to API fetch instead
+          console.error('Error fetching from cache (fetch failed or timed out):', fetchError.message || fetchError);
+          // If Supabase fetch fails or times out, return empty array
           cacheError = fetchError;
           cachedProperties = null;
         }
@@ -159,7 +166,8 @@ export class PropertyCacheService {
           details: cacheError.details || cacheError.toString(),
           code: cacheError.code || 'unknown'
         });
-        // Continue to API fetch instead of returning empty
+        // Return empty array on error instead of trying to fetch from API
+        return [];
       }
 
       if (cachedProperties && cachedProperties.length > 0) {
@@ -195,38 +203,6 @@ export class PropertyCacheService {
       console.log('[Cache] Cache miss or stale - returning empty array');
       console.log('[Cache] Cache will be populated by the scheduled cron job');
       return [];
-      
-      // Note: Removed automatic API fetch during page render because it takes ~20 minutes
-      // The cron job will populate the cache automatically
-      // const properties = await this.fetchAllPropertiesFromAPI();
-      
-      console.log(`[Cache] Fetched ${properties.length} properties from API`);
-      
-      if (properties.length > 0) {
-        // Store all properties in cache
-        console.log('[Cache] Attempting to cache properties to Supabase...');
-        try {
-          await this.cacheAllProperties(properties);
-          console.log('[Cache] ✅ Successfully cached properties to Supabase');
-        } catch (cacheError: any) {
-          console.error('[Cache] ❌ Failed to cache properties to Supabase:', cacheError.message || cacheError);
-          // Continue anyway - return properties even if caching fails
-          console.log('[Cache] ⚠️  Returning properties without caching (cache write failed)');
-        }
-      } else {
-        console.warn('[Cache] ⚠️  No properties fetched from API - nothing to cache');
-      }
-
-      // Filter for only active properties (exclude under contract)
-      // Note: API already filters for Grandview Realty, so these are all from that office
-      // Use MlsStatus as primary, fallback to StandardStatus
-      const activeProperties = properties.filter(property => {
-        const status = property.MlsStatus || property.StandardStatus || '';
-        return status === 'Active';
-      });
-      
-      console.log(`[Cache] Filtered to ${activeProperties.length} active properties from Grandview Realty`);
-      return activeProperties;
     } catch (error) {
       console.error('Error in getAllProperties:', error);
       return [];

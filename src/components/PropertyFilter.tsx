@@ -135,21 +135,32 @@ export default function PropertyFilter({ initialProperties }: FilterProps) {
   });
   const [filteredProperties, setFilteredProperties] = useState<Property[]>(initialProperties);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(initialProperties.length > 0);
 
   useEffect(() => {
     const filtered = filterProperties(initialProperties, filters);
     setFilteredProperties(filtered);
+    // If we have properties, stop loading immediately
+    if (initialProperties.length > 0) {
+      setIsLoading(false);
+    }
   }, [initialProperties, filters]);
 
   // Handle loading state - show loading for a brief moment to allow images to load
+  // But only if we actually have properties to show
   useEffect(() => {
+    if (initialProperties.length === 0) {
+      // No properties, don't show loading state
+      setIsLoading(false);
+      return;
+    }
+    
     const timer = setTimeout(() => {
       setIsLoading(false);
     }, 1000); // Show loading for 1 second to allow images to start loading
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [initialProperties.length]);
 
   const handleFilterChange = (key: keyof FilterState, value: string) => {
     const newFilters = { ...filters, [key]: value };
@@ -312,14 +323,19 @@ export default function PropertyFilter({ initialProperties }: FilterProps) {
       </div>
 
       {/* Results Count */}
-      <div className="mb-6">
-        <p className="text-gray-600">
-          Showing {filteredProperties.length} of {initialProperties.length} properties
-        </p>
-      </div>
+      {initialProperties.length > 0 && (
+        <div className="mb-6">
+          <p className="text-gray-600">
+            Showing {filteredProperties.length} of {initialProperties.length} properties
+          </p>
+        </div>
+      )}
 
       {/* Filtered Properties Grid */}
-      {isLoading ? (
+      {initialProperties.length === 0 ? (
+        // No properties at all - this is handled by the parent page component
+        null
+      ) : isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {Array.from({ length: 6 }).map((_, index) => (
             <PropertyCardSkeleton key={index} />
