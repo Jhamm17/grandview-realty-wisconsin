@@ -34,21 +34,6 @@ async function refreshCache() {
   console.log(`📡 Calling: ${apiUrl}`);
   console.log(`⏰ Started at: ${new Date().toISOString()}\n`);
 
-  const options = {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      'User-Agent': 'GitHub-Actions-Cache-Refresh/1.0',
-    },
-    // Follow redirects automatically
-    maxRedirects: 5
-  };
-
-  // Add cron secret if provided
-  if (cronSecret) {
-    options.headers['x-cron-secret'] = cronSecret;
-  }
-
   return new Promise((resolve, reject) => {
     const makeRequest = (requestUrl, redirectCount = 0) => {
       if (redirectCount > 5) {
@@ -59,7 +44,26 @@ async function refreshCache() {
       const urlObj = new URL(requestUrl);
       const client = urlObj.protocol === 'https:' ? https : http;
       
-      const req = client.request(urlObj, options, (res) => {
+      // Build request options
+      const requestOptions = {
+        hostname: urlObj.hostname,
+        port: urlObj.port || (urlObj.protocol === 'https:' ? 443 : 80),
+        path: urlObj.pathname + urlObj.search,
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'User-Agent': 'GitHub-Actions-Cache-Refresh/1.0',
+        }
+      };
+      
+      // Add cron secret if provided
+      if (cronSecret) {
+        requestOptions.headers['x-cron-secret'] = cronSecret;
+      }
+      
+      console.log(`📡 Making request to: ${urlObj.protocol}//${urlObj.hostname}${urlObj.pathname}`);
+      
+      const req = client.request(requestOptions, (res) => {
         // Handle redirects
         if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
           console.log(`🔄 Redirect ${res.statusCode} to: ${res.headers.location}`);
@@ -104,8 +108,20 @@ async function refreshCache() {
       });
       
       req.on('error', (error) => {
-        console.error('❌ Request error:', error);
+        console.error('❌ Request error:', error.message || error);
+        console.error('❌ Error details:', {
+          code: error.code,
+          errno: error.errno,
+          syscall: error.syscall,
+          hostname: urlObj.hostname
+        });
         reject(error);
+      });
+      
+      // Set a timeout for the request (30 seconds)
+      req.setTimeout(30000, () => {
+        req.destroy();
+        reject(new Error('Request timeout after 30 seconds'));
       });
       
       req.end();
@@ -123,5 +139,11 @@ refreshCache()
   })
   .catch((error) => {
     console.error('\n❌ Fatal error:', error.message);
+    console.error('Error stack:', error.stack);
+    console.error('\n💡 Troubleshooting tips:');
+    console.error('  1. Check that VERCEL_URL is set correctly');
+    console.error('  2. Verify the URL is accessible');
+    console.error('  3. Check that CRON_SECRET matches in both GitHub and Vercel');
+    console.error('  4. Verify the API endpoint exists: /api/admin/refresh-cache');
     process.exit(1);
   });
