@@ -10,7 +10,7 @@ jobs:
   refresh-cache:
     name: Refresh Property and Agent Cache
     runs-on: ubuntu-latest
-    timeout-minutes: 30  # Allow up to 30 minutes (GitHub Actions max is 6 hours)
+    timeout-minutes: 90  # Allow up to 30 minutes (GitHub Actions max is 6 hours)
     
     steps:
       - name: Checkout repository
