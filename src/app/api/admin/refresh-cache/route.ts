@@ -3,11 +3,13 @@ import { PropertyCacheService } from '@/lib/property-cache';
 import { AgentCacheService } from '@/lib/agent-cache';
 import { AdminAuthService } from '@/lib/admin-auth';
 import { revalidatePath } from 'next/cache';
+import { Property } from '@/lib/mred/types';
 
 // Mark this route as dynamic to prevent build-time static generation
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 export const maxDuration = 60; // Maximum execution time: 60 seconds (Vercel Pro plan limit)
+// Note: For longer operations, the cron job returns immediately and processes in background
 
 // Rate limiting for cache refresh (prevent multiple simultaneous refreshes)
 let lastRefreshTime = 0;
@@ -63,12 +65,34 @@ async function refreshCache(isCronJob: boolean, adminEmail?: string) {
       await PropertyCacheService.clearCache();
       
       console.log('🔄 Fetching fresh properties from MLS API...');
-      // Set timeout to 45 seconds for property cache refresh (leave buffer for other operations)
-      const properties = await withTimeout(
-        PropertyCacheService.getAllProperties(),
-        45000,
-        'Property cache refresh timed out after 45 seconds'
-      );
+      // For cron jobs, we use fetchFreshActiveProperties and fetchFreshUnderContractProperties
+      // which are optimized for batch processing. For manual refreshes, use getAllProperties.
+      let properties: Property[];
+      
+      if (isCronJob) {
+        // Cron job: Use optimized batch fetching methods
+        console.log('📦 Using optimized batch fetching for cron job...');
+        const activeProperties = await PropertyCacheService.fetchFreshActiveProperties();
+        const underContractProperties = await PropertyCacheService.fetchFreshUnderContractProperties();
+        properties = [...activeProperties, ...underContractProperties];
+        console.log(`✅ Fetched ${activeProperties.length} active + ${underContractProperties.length} under contract = ${properties.length} total properties`);
+        
+        // Save fetched properties to cache
+        if (properties.length > 0) {
+          console.log('💾 Saving properties to Supabase cache...');
+          await PropertyCacheService.cacheAllProperties(properties);
+          console.log(`✅ Successfully cached ${properties.length} properties to Supabase`);
+        }
+      } else {
+        // Manual refresh: Use standard method with timeout
+        // Set timeout to 50 seconds for property cache refresh (leave buffer for other operations)
+        properties = await withTimeout(
+          PropertyCacheService.getAllProperties(),
+          50000, // 50 seconds - enough for most cases
+          'Property cache refresh timed out after 50 seconds'
+        );
+        // Note: getAllProperties() already handles caching internally
+      }
       
       results.propertyCache = { success: true, count: properties.length };
       console.log(`✅ Property cache refreshed! Loaded ${properties.length} properties`);
@@ -179,8 +203,8 @@ export async function GET(request: NextRequest) {
         console.log('🚀 Starting background cache refresh process...');
         const result = await withTimeout(
           refreshCache(true),
-          55000,
-          'Cache refresh exceeded maximum execution time (55 seconds)'
+          290000, // 4 minutes 50 seconds - close to maxDuration limit
+          'Cache refresh exceeded maximum execution time (4 minutes 50 seconds)'
         );
         console.log('✅ Background cache refresh completed:', result);
       } catch (error) {
@@ -218,9 +242,40 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST handler for manual admin refreshes
+// POST handler for manual admin refreshes and cron jobs
 export async function POST(request: NextRequest) {
   try {
+    // Check if this is a cron job request (Vercel cron jobs send a special header)
+    const isCronJob = request.headers.get('x-vercel-cron') === '1';
+    
+    // If it's a cron job, return immediately and process in background (like GET handler)
+    if (isCronJob) {
+      console.log('🔍 POST handler called for /api/admin/refresh-cache (Vercel cron job)');
+      
+      // Start the cache refresh asynchronously without blocking the response
+      void (async () => {
+        try {
+          console.log('🚀 Starting background cache refresh process...');
+          const result = await refreshCache(true);
+          console.log('✅ Background cache refresh completed:', result);
+        } catch (error) {
+          console.error('❌ Background cache refresh error:', error);
+        }
+      })();
+      
+      // Return immediately with 202 Accepted - don't wait for cache refresh
+      return NextResponse.json(
+        { 
+          success: true,
+          message: 'Cache refresh initiated - processing in background',
+          timestamp: new Date().toISOString(),
+          triggeredBy: 'cron-job',
+          note: 'This endpoint returns immediately. Cache refresh continues asynchronously.'
+        },
+        { status: 202 } // 202 Accepted - request accepted, processing continues
+      );
+    }
+    
     // For manual requests, require admin authentication
     const { adminEmail } = await request.json();
     
@@ -244,7 +299,7 @@ export async function POST(request: NextRequest) {
     try {
       const result = await withTimeout(
         refreshCache(false, adminEmail),
-        55000,
+        55000, // 55 seconds - leave buffer for other operations
         'Cache refresh exceeded maximum execution time (55 seconds)'
       );
       return NextResponse.json(result);
