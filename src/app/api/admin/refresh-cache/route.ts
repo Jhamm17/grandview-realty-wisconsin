@@ -171,51 +171,48 @@ export async function GET(request: NextRequest) {
     
     console.log('🔍 GET handler called for /api/admin/refresh-cache (external cron)');
     
-    // For cron jobs, wrap in timeout to prevent exceeding Vercel limits
-    // Use 55 seconds to leave buffer before Vercel's 60s limit
-    try {
-      const result = await withTimeout(
-        refreshCache(true),
-        55000,
-        'Cache refresh exceeded maximum execution time (55 seconds)'
-      );
-      return NextResponse.json(result);
-    } catch (timeoutError) {
-      // If timeout occurs, return partial success response
-      // The cache refresh may have partially completed
-      console.error('⏱️ Cache refresh timed out, but may have partially completed');
-      return NextResponse.json(
-        { 
-          success: false,
-          message: 'Cache refresh timed out - may have partially completed',
-          error: timeoutError instanceof Error ? timeoutError.message : 'Timeout error',
-          timestamp: new Date().toISOString(),
-          triggeredBy: 'cron-job'
-        },
-        { status: 202 } // 202 Accepted - request accepted but not completed
-      );
-    }
+    // For external cron services (like cron-job.org), return immediately
+    // Start the cache refresh asynchronously without blocking the response
+    // Use void to explicitly mark as fire-and-forget
+    void (async () => {
+      try {
+        console.log('🚀 Starting background cache refresh process...');
+        const result = await withTimeout(
+          refreshCache(true),
+          55000,
+          'Cache refresh exceeded maximum execution time (55 seconds)'
+        );
+        console.log('✅ Background cache refresh completed:', result);
+      } catch (error) {
+        console.error('❌ Background cache refresh error:', error);
+      }
+    })();
+    
+    // Return immediately with 202 Accepted - don't wait for cache refresh
+    // This prevents timeout issues with external cron services
+    return NextResponse.json(
+      { 
+        success: true,
+        message: 'Cache refresh initiated - processing in background',
+        timestamp: new Date().toISOString(),
+        triggeredBy: 'cron-job',
+        note: 'This endpoint returns immediately. Cache refresh continues asynchronously.'
+      },
+      { status: 202 } // 202 Accepted - request accepted, processing continues
+    );
 
   } catch (error) {
     console.error('❌ Error in GET refresh-cache:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     
-    // If it's a timeout, return 202 instead of 500
-    if (errorMessage.includes('timeout') || errorMessage.includes('exceeded')) {
-      return NextResponse.json(
-        { 
-          success: false,
-          message: 'Cache refresh timed out - may have partially completed',
-          error: errorMessage,
-          timestamp: new Date().toISOString(),
-          triggeredBy: 'cron-job'
-        },
-        { status: 202 }
-      );
-    }
-    
     return NextResponse.json(
-      { error: 'Failed to refresh cache', details: errorMessage },
+      { 
+        success: false,
+        message: 'Failed to initiate cache refresh',
+        error: errorMessage,
+        timestamp: new Date().toISOString(),
+        triggeredBy: 'cron-job'
+      },
       { status: 500 }
     );
   }
