@@ -1,0 +1,51 @@
+name: Refresh Property Cache
+
+on:
+  schedule:
+    # Run daily at 6 AM UTC (1 AM EST / 12 AM CST)
+    - cron: '0 6 * * *'
+  workflow_dispatch:  # Allow manual trigger from GitHub UI
+
+jobs:
+  refresh-cache:
+    name: Refresh Property and Agent Cache
+    runs-on: ubuntu-latest
+    timeout-minutes: 30  # Allow up to 30 minutes (GitHub Actions max is 6 hours)
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Refresh Property Cache via API
+        env:
+          VERCEL_URL: ${{ secrets.VERCEL_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          echo "🚀 Triggering cache refresh via API..."
+          echo "📡 This will return immediately, but processing continues in background"
+          echo "⏰ Started at: $(date)"
+          echo ""
+          
+          # Call the refresh-cache endpoint
+          # The endpoint returns immediately (202) and processes in background
+          node scripts/refresh-cache-simple.js
+          
+          echo ""
+          echo "✅ Cache refresh initiated successfully!"
+          echo "⏳ Background processing may take 20+ minutes"
+          echo "📊 Check Vercel function logs to monitor progress"
+
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "❌ Cache refresh failed!"
+          # You can add Slack/Discord/Email notifications here if needed
