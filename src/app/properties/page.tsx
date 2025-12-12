@@ -1,6 +1,7 @@
 import { PropertyCacheService } from '@/lib/property-cache';
 import PropertyFilter from '@/components/PropertyFilter';
 import { Metadata } from 'next';
+import { Property } from '@/lib/mred/types';
 
 // Preload component for property images
 function PreloadPropertyImages({ properties }: { properties: any[] }) {
