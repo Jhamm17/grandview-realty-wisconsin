@@ -52,7 +52,13 @@ jobs:
           # Run the standalone script directly using tsx (TypeScript executor)
           # This runs the full property fetch and cache update in GitHub Actions
           # The script will take 20+ minutes to complete
-          npx tsx scripts/refresh-cache-standalone.ts
+          # Use --no-warnings to suppress Node.js warnings
+          # Use --tsconfig to ensure proper TypeScript path resolution
+          npx tsx --tsconfig tsconfig.json --no-warnings scripts/refresh-cache-standalone.ts 2>&1 | tee refresh-cache.log || {
+            echo "❌ Script failed! Showing last 50 lines of output:"
+            tail -50 refresh-cache.log || echo "No log file found"
+            exit 1
+          }
           
           echo ""
           echo "✅ Cache refresh completed!"
