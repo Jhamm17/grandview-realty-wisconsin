@@ -6,7 +6,7 @@
  * This allows the full 20-minute script to run without Vercel timeout limits
  * 
  * Usage:
- *   npx tsx scripts/refresh-cache-standalone.ts
+ *   node scripts/refresh-cache-standalone.js
  * 
  * Environment variables required:
  *   - NEXT_PUBLIC_WISCONSIN_SUPABASE_URL
@@ -17,49 +17,31 @@
  *   - MLS_Aligned_User_Agent (optional)
  */
 
+// Use dynamic import for ES modules
 async function refreshCache() {
   const startTime = Date.now();
   console.log('🚀 Starting cache refresh (running directly in GitHub Actions)...');
   console.log(`⏰ Started at: ${new Date().toISOString()}\n`);
 
   // Check environment variables
-  console.log('🔍 Checking environment variables...');
-  const requiredEnvVars = [
-    'NEXT_PUBLIC_WISCONSIN_SUPABASE_URL',
-    'WISCONSIN_SUPABASE_SERVICE_ROLE_KEY',
-    'WISCONSIN_MLS_ACCESS_TOKEN'
-  ];
-  
-  const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
-  if (missingVars.length > 0) {
+  if (!process.env.NEXT_PUBLIC_WISCONSIN_SUPABASE_URL || !process.env.WISCONSIN_SUPABASE_SERVICE_ROLE_KEY) {
     console.error('❌ Missing required environment variables:');
-    missingVars.forEach(varName => console.error(`   - ${varName}`));
+    console.error('   - NEXT_PUBLIC_WISCONSIN_SUPABASE_URL');
+    console.error('   - WISCONSIN_SUPABASE_SERVICE_ROLE_KEY');
     process.exit(1);
   }
-  console.log('✅ All required environment variables are set\n');
 
-  // Dynamically import modules to handle TypeScript compilation
-  console.log('📦 Loading TypeScript modules...');
-  let PropertyCacheService: any;
-  let AgentCacheService: any;
+  // Dynamically import ES modules
+  // Note: Need to use .ts extension or let Node.js resolve it
+  const propertyCacheModule = await import('../src/lib/property-cache.ts');
+  const agentCacheModule = await import('../src/lib/agent-cache.ts');
   
-  try {
-    const propertyCacheModule = await import('../src/lib/property-cache');
-    PropertyCacheService = propertyCacheModule.PropertyCacheService;
-    console.log('✅ PropertyCacheService loaded');
-    
-    const agentCacheModule = await import('../src/lib/agent-cache');
-    AgentCacheService = agentCacheModule.AgentCacheService;
-    console.log('✅ AgentCacheService loaded\n');
-  } catch (error) {
-    console.error('❌ Failed to load modules:', error);
-    console.error('Error details:', error instanceof Error ? error.stack : String(error));
-    process.exit(1);
-  }
+  const { PropertyCacheService } = propertyCacheModule;
+  const { AgentCacheService } = agentCacheModule;
 
   const results = {
-    properties: { success: false, count: 0, error: null as string | null },
-    agents: { success: false, count: 0, error: null as string | null },
+    properties: { success: false, count: 0, error: null },
+    agents: { success: false, count: 0, error: null },
     totalDuration: 0
   };
 
@@ -68,25 +50,17 @@ async function refreshCache() {
   try {
     // Clear existing cache
     console.log('   🗑️  Clearing existing property cache...');
-    const clearStart = Date.now();
     await PropertyCacheService.clearCache();
-    console.log(`   ✅ Cache cleared in ${((Date.now() - clearStart) / 1000).toFixed(2)}s`);
     
     // Fetch fresh properties (this will take ~20 minutes)
     console.log('   🔄 Fetching fresh properties from MLS API...');
     console.log('   ⏳ This may take 20+ minutes depending on property count...');
-    console.log('   📡 Starting with active properties...');
     
-    const activeStart = Date.now();
     const activeProperties = await PropertyCacheService.fetchFreshActiveProperties();
-    const activeDuration = ((Date.now() - activeStart) / 1000).toFixed(2);
-    console.log(`   ✅ Fetched ${activeProperties.length} active properties in ${activeDuration}s`);
+    console.log(`   ✅ Fetched ${activeProperties.length} active properties`);
     
-    console.log('   📡 Now fetching under contract properties...');
-    const underContractStart = Date.now();
     const underContractProperties = await PropertyCacheService.fetchFreshUnderContractProperties();
-    const underContractDuration = ((Date.now() - underContractStart) / 1000).toFixed(2);
-    console.log(`   ✅ Fetched ${underContractProperties.length} under contract properties in ${underContractDuration}s`);
+    console.log(`   ✅ Fetched ${underContractProperties.length} under contract properties`);
     
     const allProperties = [...activeProperties, ...underContractProperties];
     console.log(`   📦 Total properties: ${allProperties.length}`);
@@ -94,22 +68,15 @@ async function refreshCache() {
     // Cache all properties
     if (allProperties.length > 0) {
       console.log('   💾 Caching properties to Supabase...');
-      const cacheStart = Date.now();
       await PropertyCacheService.cacheAllProperties(allProperties);
-      const cacheDuration = ((Date.now() - cacheStart) / 1000).toFixed(2);
-      console.log(`   ✅ Successfully cached ${allProperties.length} properties to Supabase in ${cacheDuration}s`);
+      console.log(`   ✅ Successfully cached ${allProperties.length} properties to Supabase`);
     } else {
       console.warn('   ⚠️  No properties fetched - cache may be empty');
-      console.warn('   ⚠️  This could indicate an API issue or no properties available');
     }
     
     results.properties = { success: true, count: allProperties.length, error: null };
   } catch (error) {
     console.error('   ❌ Error refreshing property cache:', error);
-    if (error instanceof Error) {
-      console.error('   Error message:', error.message);
-      console.error('   Error stack:', error.stack);
-    }
     results.properties = { 
       success: false, 
       count: 0, 
