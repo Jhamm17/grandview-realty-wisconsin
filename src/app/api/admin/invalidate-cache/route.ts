@@ -9,9 +9,10 @@ export async function POST(request: NextRequest) {
       // Revalidate specific path
       revalidatePath(path);
     } else {
-      // Revalidate team pages
+      // Revalidate all public pages
       revalidatePath('/team/agents');
       revalidatePath('/team/office-staff');
+      revalidatePath('/careers');
     }
     
     return NextResponse.json({ 

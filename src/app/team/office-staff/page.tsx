@@ -125,7 +125,7 @@ export default async function OfficeStaffPage() {
 
               {/* Description */}
               {member.description && (
-                <p className="text-gray-600 leading-relaxed">{member.description}</p>
+                <p className="text-gray-600 leading-relaxed preserve-line-breaks">{member.description}</p>
               )}
             </div>
           </div>

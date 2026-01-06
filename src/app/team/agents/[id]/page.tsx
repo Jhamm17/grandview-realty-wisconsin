@@ -154,7 +154,7 @@ export default async function AgentPage({ params }: { params: { id: string } }) 
           {agent.description && (
             <div className="mb-8">
               <h4 className="font-semibold text-gray-800 mb-3">About</h4>
-              <p className="text-gray-600 leading-relaxed">{agent.description}</p>
+              <p className="text-gray-600 leading-relaxed preserve-line-breaks">{agent.description}</p>
             </div>
           )}
 
@@ -162,7 +162,7 @@ export default async function AgentPage({ params }: { params: { id: string } }) 
           {agent.bio && (
             <div className="mb-8">
               <h4 className="font-semibold text-gray-800 mb-3">Bio</h4>
-              <p className="text-gray-600 leading-relaxed">{agent.bio}</p>
+              <p className="text-gray-600 leading-relaxed preserve-line-breaks">{agent.bio}</p>
             </div>
           )}
 

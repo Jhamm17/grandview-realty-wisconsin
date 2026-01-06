@@ -101,7 +101,9 @@ export default function AdminCareersManager({ onClose }: AdminCareersManagerProp
       });
 
       if (!response.ok) {
-        throw new Error('Failed to save career');
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.details || errorData.error || 'Failed to save career';
+        throw new Error(errorMessage);
       }
 
       await fetchCareers();
@@ -115,7 +117,8 @@ export default function AdminCareersManager({ onClose }: AdminCareersManagerProp
 
       resetForm();
     } catch (error) {
-      setError('Failed to save career');
+      const errorMessage = error instanceof Error ? error.message : 'Failed to save career';
+      setError(errorMessage);
       console.error('Error saving career:', error);
     }
   };
@@ -143,7 +146,8 @@ export default function AdminCareersManager({ onClose }: AdminCareersManagerProp
         body: JSON.stringify({ path: '/careers' })
       });
     } catch (error) {
-      setError('Failed to delete career');
+      const errorMessage = error instanceof Error ? error.message : 'Failed to delete career';
+      setError(errorMessage);
       console.error('Error deleting career:', error);
     }
   };
@@ -358,7 +362,7 @@ export default function AdminCareersManager({ onClose }: AdminCareersManagerProp
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({...formData, description: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="admin-textarea"
                   rows={4}
                   required
                 />
