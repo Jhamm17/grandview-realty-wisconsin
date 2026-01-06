@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import ImageUpload from './ImageUpload';
+import MarkdownHelp from './MarkdownHelp';
 
 interface Agent {
   id: string;
@@ -432,13 +433,15 @@ export default function AdminAgentManager({ onClose }: AdminAgentManagerProps) {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Description
+                  Description (Markdown supported)
                 </label>
+                <MarkdownHelp />
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({...formData, description: e.target.value})}
-                  rows={4}
+                  rows={6}
                   className="admin-textarea"
+                  placeholder="You can use Markdown formatting here. Click 'Show Markdown Help' for examples."
                 />
               </div>
 

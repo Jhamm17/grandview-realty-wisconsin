@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import JobApplicationForm from '@/components/JobApplicationForm';
+import MarkdownRenderer from '@/components/MarkdownRenderer';
 
 interface Career {
   id: string;
@@ -59,7 +60,7 @@ export default function CareersClient({ careers }: CareersClientProps) {
                         </span>
                       )}
                     </div>
-                    <p className="text-gray-600 mb-4 preserve-line-breaks">{position.description}</p>
+                    <MarkdownRenderer content={position.description} className="mb-4" />
                     
                     {/* Requirements */}
                     {position.requirements && position.requirements.length > 0 && (

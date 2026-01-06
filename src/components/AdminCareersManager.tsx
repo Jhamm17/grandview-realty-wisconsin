@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import MarkdownHelp from './MarkdownHelp';
 
 interface Career {
   id: string;
@@ -357,13 +358,15 @@ export default function AdminCareersManager({ onClose }: AdminCareersManagerProp
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Description *
+                  Description * (Markdown supported)
                 </label>
+                <MarkdownHelp />
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({...formData, description: e.target.value})}
                   className="admin-textarea"
-                  rows={4}
+                  rows={6}
+                  placeholder="You can use Markdown formatting here. Click 'Show Markdown Help' for examples."
                   required
                 />
               </div>

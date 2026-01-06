@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase';
+import MarkdownRenderer from '@/components/MarkdownRenderer';
 
 export const dynamic = 'force-dynamic';
 
@@ -125,7 +126,7 @@ export default async function OfficeStaffPage() {
 
               {/* Description */}
               {member.description && (
-                <p className="text-gray-600 leading-relaxed preserve-line-breaks">{member.description}</p>
+                <MarkdownRenderer content={member.description} />
               )}
             </div>
           </div>
