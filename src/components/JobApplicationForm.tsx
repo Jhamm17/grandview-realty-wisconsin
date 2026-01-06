@@ -14,6 +14,7 @@ export default function JobApplicationForm({ jobTitle, isOpen, onClose }: JobApp
     email: '',
     phone: ''
   });
+  const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -21,16 +22,21 @@ export default function JobApplicationForm({ jobTitle, isOpen, onClose }: JobApp
     setIsSubmitting(true);
 
     try {
-      // Send job application email
+      // Create FormData to handle file upload
+      const formDataToSend = new FormData();
+      formDataToSend.append('name', formData.name);
+      formDataToSend.append('email', formData.email);
+      formDataToSend.append('phone', formData.phone);
+      formDataToSend.append('jobTitle', jobTitle);
+      
+      if (resumeFile) {
+        formDataToSend.append('resume', resumeFile);
+      }
+
+      // Send job application email with file
       const response = await fetch('/api/job-application', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          jobTitle,
-          ...formData
-        }),
+        body: formDataToSend, // Don't set Content-Type header, browser will set it with boundary
       });
 
       const result = await response.json();
@@ -42,6 +48,12 @@ export default function JobApplicationForm({ jobTitle, isOpen, onClose }: JobApp
         }
         // Reset form and close modal
         setFormData({ name: '', email: '', phone: '' });
+        setResumeFile(null);
+        // Reset file input
+        const fileInput = document.getElementById('resume') as HTMLInputElement;
+        if (fileInput) {
+          fileInput.value = '';
+        }
         setIsSubmitting(false);
         onClose();
         
@@ -65,6 +77,34 @@ export default function JobApplicationForm({ jobTitle, isOpen, onClose }: JobApp
     }));
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validate file type
+      const allowedTypes = [
+        'application/pdf',
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'text/plain'
+      ];
+      
+      if (!allowedTypes.includes(file.type)) {
+        alert('Please upload a PDF, Word document (.doc, .docx), or text file.');
+        e.target.value = '';
+        return;
+      }
+      
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('File size must be less than 5MB.');
+        e.target.value = '';
+        return;
+      }
+      
+      setResumeFile(file);
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -73,7 +113,14 @@ export default function JobApplicationForm({ jobTitle, isOpen, onClose }: JobApp
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold text-gray-800">Apply for {jobTitle}</h2>
           <button
-            onClick={onClose}
+            onClick={() => {
+              setResumeFile(null);
+              const fileInput = document.getElementById('resume') as HTMLInputElement;
+              if (fileInput) {
+                fileInput.value = '';
+              }
+              onClose();
+            }}
             className="text-gray-400 hover:text-gray-600 text-2xl font-bold"
             aria-label="Close"
           >
@@ -130,10 +177,39 @@ export default function JobApplicationForm({ jobTitle, isOpen, onClose }: JobApp
             />
           </div>
 
+          <div>
+            <label htmlFor="resume" className="block text-sm font-medium text-gray-700 mb-1">
+              Resume (Optional)
+            </label>
+            <input
+              type="file"
+              id="resume"
+              name="resume"
+              accept=".pdf,.doc,.docx,.txt"
+              onChange={handleFileChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+            />
+            {resumeFile && (
+              <p className="text-xs text-gray-500 mt-1">
+                Selected: {resumeFile.name} ({(resumeFile.size / 1024).toFixed(1)} KB)
+              </p>
+            )}
+            <p className="text-xs text-gray-500 mt-1">
+              Accepted formats: PDF, Word (.doc, .docx), or Text (.txt). Max size: 5MB
+            </p>
+          </div>
+
           <div className="flex gap-3 pt-4">
             <button
               type="button"
-              onClick={onClose}
+              onClick={() => {
+                setResumeFile(null);
+                const fileInput = document.getElementById('resume') as HTMLInputElement;
+                if (fileInput) {
+                  fileInput.value = '';
+                }
+                onClose();
+              }}
               className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
             >
               Cancel
